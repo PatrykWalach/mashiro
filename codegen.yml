@@ -1,0 +1,85 @@
+require:
+  - ts-node/register
+config:
+  noSchemaStitching: true
+  namingConvention:
+    enumValues: 'upper-case#upperCase'
+  contextType: ../../context#Context
+  mappers:
+    # showUnusedMappers: true
+    Item: ../Item#ItemModel
+    Match: ../Match#MatchModel
+    CurrentActivity: ../MashiroActivity#CurrentActivityModel
+    PendingActivity: ../MashiroActivity#PendingActivityModel
+    PastActivity: ../MashiroActivity#PastActivityModel
+    Channel: ../Channel#ChannelModel
+    File: ../File#FileModel
+generates:
+  ./src/background/entities/__generated__/Media.ts:
+    schema:
+      - src/background/entities/Media.ts
+    plugins:
+      - typescript
+      - typescript-resolvers
+    # config:
+      # mappers:
+        # Media: ../Media#MediaModel
+  ./src/background/entities/__generated__/Match.ts:
+    schema:
+      - src/background/entities/Match.ts
+    plugins:
+      - typescript
+      - typescript-resolvers
+  ./src/background/entities/__generated__/File.ts:
+    schema:
+      - src/background/entities/File.ts
+    plugins:
+      - typescript
+      - typescript-resolvers
+  ./src/background/entities/__generated__/MashiroActivity.ts:
+    schema:
+      - src/background/entities/MashiroActivity.ts
+    plugins:
+      - typescript
+      - typescript-resolvers
+  ./src/background/entities/__generated__/Channel.ts:
+    schema:
+      - src/background/entities/Channel.ts
+    plugins:
+      - typescript
+      - typescript-resolvers
+  ./src/background/entities/__generated__/Item.ts:
+    schema:
+      - src/background/entities/Item.ts
+    plugins:
+      - typescript
+      - typescript-resolvers
+      # enumValues:
+      #   ActivityWeekday:
+      #     MONDAY: 'poniedziałek'
+      #     TUESDAY: 'wtorek'
+      #     WEDNESDAY: 'środa'
+      #     THURSDAY: 'czwartek'
+      #     FRIDAY: 'piątek'
+
+  ./src/__generated__/globalTypes.ts:
+    schema:
+      - https://graphql.anilist.co
+    plugins:
+      - typescript
+
+  # ./src/:
+  #   preset: near-operation-file
+  #   presetConfig:
+  #     folder: __generated__
+  #     extension: .ts
+  #     baseTypesPath: __generated__/globalTypes.ts
+  #   documents: src/**/!(__generated__)/*.ts
+  #   schema:
+  #     - src/background/server/schema.ts
+  #     - src/client/index.ts
+  #   plugins:
+  #     - typescript-operations
+  #     - typescript-vue-apollo
+  #   config:
+  #     documentMode: documentNodeImportFragments
