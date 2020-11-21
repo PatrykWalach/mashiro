@@ -19,7 +19,7 @@ export const getRssChannel = async (uri: string): Promise<ChannelModel> => {
 }
 
 export const ChannelResolvers: Resolvers = {
-  Channel: { items: ({ item }) => item },
+  Channel: { items: ({ item }) => (Array.isArray(item) ? item : [item]) },
   Query: {
     Channel: (_, { uri }) => getRssChannel(uri),
   },
@@ -54,5 +54,5 @@ export interface ChannelModel {
   title: string
   description: string
   link: string
-  item: ItemModel[]
+  item: ItemModel[] | ItemModel
 }
