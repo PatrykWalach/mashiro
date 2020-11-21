@@ -39,7 +39,7 @@ export const createSchema = async () => {
             },
             fieldName: '_media',
             key: ({ id }) => ({ id }),
-            argsFromKeys: media => ({ media }),
+            argsFromKeys: id_in => ({ id_in }),
           },
         },
       },
@@ -56,12 +56,10 @@ export const createServer = (schema: GraphQLSchema, port: number) => {
   app.use(
     '/graphql',
     cors(),
-    graphqlHTTP(() => {
-      return {
-        schema,
-        graphiql: true,
-        context: { db },
-      }
+    graphqlHTTP({
+      schema,
+      graphiql: true,
+      context: { db },
     }),
   )
 

@@ -16,14 +16,12 @@ export const MediaResolvers: Resolvers = {
     },
   },
   Query: {
-    async _media(_, { media = [] }, { db }) {
-      const ids = media.map(({ id }) => id)
-
-      const found = await db.promise<MatchModel[]>(cb =>
-        db.media.find({ id: { $in: ids } }, cb),
+    async _media(_, { id_in = [] }, { db }) {
+      const found = await db.promise<MediaModel[]>(cb =>
+        db.media.find({ id: { $in: id_in } }, cb),
       )
 
-      return valuesFromResults('id')(found, ids)
+      return valuesFromResults('id')(found, id_in)
     },
   },
 }
@@ -40,13 +38,8 @@ export default /* GraphQL */ `
     alternativeTitles: [String]
   }
 
-  input MediaInput {
-    id: Int
-    synonyms: [String]
-  }
-
   type Query {
-    _media(media: [MediaInput!]!): [Media]
+    _media(id_in: [Int!]!): [Media]
   }
 `
 
