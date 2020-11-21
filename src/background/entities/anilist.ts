@@ -146,7 +146,7 @@ export const Media: MergedTypeConfig<string> = {
   key: ({ id }) => id,
   resolve: createMergeResolverWithTransform({
     argsFromKeys: id_in => ({ id_in }),
-    valuesFromResults,
+    valuesFromResults: valuesFromResults('id'),
     fieldName: 'Page',
     transforms: [
       new WrapQueryWithField({

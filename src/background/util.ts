@@ -64,15 +64,20 @@ export const keyToBoolean = <T>(item: T, key: keyof T) => {
 export const checkUndefined = <T>(value: T | undefined): T | null =>
   value === undefined ? null : value
 
-export const valuesFromResults = <T extends { id: string | number }>(
+export const valuesFromResults = <Id extends string | symbol | number>(
+  id: Id,
+) => <
+  K extends string | symbol | number,
+  T extends {
+    [J in Id]: K
+  }
+>(
   media: T[],
-  keys: readonly number[],
-) => {
-  const mediaIdToIndex: Record<string | number, number> = {}
-
-  media.forEach(({ id }, i) => {
-    mediaIdToIndex[id] = i
-  })
+  keys: readonly K[],
+): (T | null)[] => {
+  const mediaIdToIndex: Record<K, number> = Object.fromEntries(
+    media.map((result, i) => [[result[id]], i]),
+  )
 
   return keys.map(id => media[mediaIdToIndex[id]] || null)
 }

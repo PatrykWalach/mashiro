@@ -23,7 +23,7 @@ export const MediaResolvers: Resolvers = {
         db.media.find({ id: { $in: ids } }, cb),
       )
 
-      return valuesFromResults(found, ids)
+      return valuesFromResults('id')(found, ids)
     },
   },
 }
