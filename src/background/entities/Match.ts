@@ -1,7 +1,4 @@
 import { Resolvers } from './__generated__/Match'
-import { app } from 'electron'
-import Datastore from 'nedb'
-import { join } from 'path'
 
 export default /* GraphQL */ `
   type Media {
@@ -23,11 +20,10 @@ export interface MatchModel {
 export const MatchResolvers: Resolvers = {
   Match: {
     id: ({ _id }) => _id,
-    media: ({ mediaId }) => ({ id: mediaId }),
+    media: ({ mediaId }, _, { data }) =>
+      data
+        .get('media')
+        .find({ id: mediaId })
+        .value(),
   },
 }
-
-export const matches = new Datastore<MatchModel>({
-  filename: join(app.getPath('appData'), 'mashiro', 'matches.db'),
-  autoload: true,
-})

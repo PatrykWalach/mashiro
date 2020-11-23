@@ -81,6 +81,7 @@ if (isDevelopment) {
 }
 
 import { createSchema, createServer } from './background/server'
+import { createContext } from './background/context'
 
 app.on('before-quit', async () => {
   console.log('quit')
@@ -97,25 +98,27 @@ process.dlopen = () => {
 
 const port = 5000
 
-createSchema().then(async schema => {
-  createServer(schema, port)
+Promise.all([createContext(), createSchema()]).then(
+  async ([context, schema]) => {
+    createServer(schema, port, context)
 
-  // tracker.on('message', event => {
-  //   console.log(event)
-  //   if (event.type === 'players-opened') {
-  //     graphql(
-  //       schema,
-  //       print(gql`
-  //     mutation AddPlayer(){
-  //       id
-  //     }
-  //     `),
-  //     )
-  //   } else if (event.type === 'players-closed') {
-  //   }
-  // })
+    // tracker.on('message', event => {
+    //   console.log(event)
+    //   if (event.type === 'players-opened') {
+    //     graphql(
+    //       schema,
+    //       print(gql`
+    //     mutation AddPlayer(){
+    //       id
+    //     }
+    //     `),
+    //     )
+    //   } else if (event.type === 'players-closed') {
+    //   }
+    // })
 
-  // app.on('before-quit', async () => {
-  //   await tracker.terminate()
-  // })
-})
+    // app.on('before-quit', async () => {
+    //   await tracker.terminate()
+    // })
+  },
+)

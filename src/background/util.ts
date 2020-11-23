@@ -101,22 +101,3 @@ export const createRemoteSchema = async ({
     loaders: [new UrlLoader()],
   }),
 })
-
-export const promise = <T>(
-  exec: (callback: (err: Error | null, documents: T) => void) => void,
-): Promise<T> =>
-  new Promise<T>((resolve, reject) => {
-    exec((err, value) => {
-      if (err) {
-        return reject(err)
-      }
-      resolve(value)
-    })
-  })
-
-// class AsyncDatabase<T> extends Database<T> {
-
-//   find(...args) {
-//     return promise(cb => super.find(...args, cb))
-//   }
-// }

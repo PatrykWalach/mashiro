@@ -1,5 +1,4 @@
 import { app } from 'electron'
-import Datastore from 'nedb'
 import { join } from 'path'
 import { Resolvers } from './__generated__/MashiroActivity'
 
@@ -74,21 +73,6 @@ export interface CurrentActivityModel extends MashiroActivityModel {
   matchId?: string
 }
 
-export const activities = new Datastore<
-  CurrentActivityModel | PendingActivityModel | PastActivityModel
->({
-  filename: join(app.getPath('appData'), 'mashiro', 'activities.db'),
-  autoload: true,
-})
-
-activities.insert({
-  _id: '',
-  mediaTitle: 'Boku no Hero',
-  className: '',
-  episode: 0,
-  startedAt: Math.floor(Date.now() / 1000),
-})
-
 export const MashiroActivityResolvers: Resolvers = {
   MashiroActivity: {
     __resolveType(obj) {
@@ -103,20 +87,29 @@ export const MashiroActivityResolvers: Resolvers = {
   },
   PastActivity: {
     id: ({ _id }) => _id,
-    match: ({ matchId }, _, { db }) =>
-      db.promise(cb => db.matches.findOne({ _id: matchId }, cb)),
+    match: ({ matchId }, _, { data }) =>
+      data
+        .get('matches')
+        .find({ _id: matchId })
+        .value(),
   },
   PendingActivity: {
     id: ({ _id }) => _id,
-    match: ({ matchId }, _, { db }) =>
-      db.promise(cb => db.matches.findOne({ _id: matchId }, cb)),
+    match: ({ matchId }, _, { data }) =>
+      data
+        .get('matches')
+        .find({ _id: matchId })
+        .value(),
   },
   CurrentActivity: {
     id: ({ _id }) => _id,
-    match: ({ matchId }, _, { db }) =>
-      db.promise(cb => db.matches.findOne({ _id: matchId }, cb)),
+    match: ({ matchId }, _, { data }) =>
+      data
+        .get('matches')
+        .find({ _id: matchId })
+        .value(),
   },
   Query: {
-    Activities: (_, __, { db }) => db.promise(cb => db.activities.find({}, cb)),
+    Activities: (_, __, { data }) => data.get('activities').value(),
   },
 }

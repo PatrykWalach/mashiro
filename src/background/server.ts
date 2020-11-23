@@ -3,12 +3,12 @@ import { GraphQLSchema } from 'graphql'
 import { makeExecutableSchema, stitchSchemas } from 'graphql-tools'
 import typeDefs from './types'
 import resolvers from './resolvers'
-import db from './database'
 // const { merge } = require('./entities/anilist')
 import { Media } from './entities/anilist'
 import { graphqlHTTP } from 'express-graphql'
 import cors from 'cors'
 import { createRemoteSchema } from './util'
+import { Context } from '@apollo/client'
 
 export const createSchema = async () => {
   const electronSchema = makeExecutableSchema({
@@ -50,7 +50,11 @@ export const createSchema = async () => {
   return schema
 }
 
-export const createServer = (schema: GraphQLSchema, port: number) => {
+export const createServer = async (
+  schema: GraphQLSchema,
+  port: number,
+  context: Context,
+) => {
   const app = express()
 
   app.use(
@@ -59,7 +63,7 @@ export const createServer = (schema: GraphQLSchema, port: number) => {
     graphqlHTTP({
       schema,
       graphiql: true,
-      context: { db },
+      context,
     }),
   )
 

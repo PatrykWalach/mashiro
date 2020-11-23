@@ -1,25 +1,23 @@
 import { Resolvers } from './__generated__/Media'
-import Datastore from 'nedb'
-import { join } from 'path'
-import { app } from 'electron'
 import { valuesFromResults } from '../util'
-import { MatchModel } from './Match'
 
 export const MediaResolvers: Resolvers = {
   Media: {
-    async alternativeTitles({ id }, _, { db }) {
-      const matches = await db.promise<MatchModel[]>(cb =>
-        db.matches.find({ mediaId: id }, cb),
-      )
+    async alternativeTitles({ id }, _, { data }) {
+      const matches = await data
+        .get('matches')
+        .filter({ mediaId: id })
+        .value()
 
       return matches.map(({ title }) => title)
     },
   },
   Query: {
-    async _media(_, { id_in = [] }, { db }) {
-      const found = await db.promise<MediaModel[]>(cb =>
-        db.media.find({ id: { $in: id_in } }, cb),
-      )
+    async _media(_, { id_in = [] }, { data }) {
+      const found = await data
+        .get('media')
+        .filter(({ id }) => id_in.includes(id))
+        .value()
 
       return valuesFromResults('id')(found, id_in)
     },
@@ -43,18 +41,7 @@ export default /* GraphQL */ `
   }
 `
 
-interface MediaModel {
+export interface MediaModel {
   id: number
   episodeOffset: number
 }
-
-export const media = new Datastore<MediaModel>({
-  filename: join(app.getPath('appData'), 'mashiro', 'media.db'),
-  autoload: true,
-})
-
-media.insert({
-  id: 1,
-  // fileTitles: ['Boy Cowboy'],
-  episodeOffset: 1,
-})

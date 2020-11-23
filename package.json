@@ -17,7 +17,6 @@
   "dependencies": {
     "@apollo/client": "^3.2.5",
     "@types/cors": "^2.8.8",
-    "@types/nedb": "^1.8.11",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "cross-fetch": "^3.0.6",
@@ -28,7 +27,7 @@
     "graphql": "^15.3.0",
     "graphql-anywhere": "^4.2.7",
     "graphql-tools": "^7.0.1",
-    "nedb": "^1.8.0",
+    "lowdb": "^1.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0"
   },
@@ -42,6 +41,7 @@
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/ffi-napi": "^2.4.3",
     "@types/jest": "^24.0.19",
+    "@types/lowdb": "^1.0.9",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "@vue/cli-plugin-babel": "~4.5.0",

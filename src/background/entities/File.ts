@@ -1,4 +1,3 @@
-import Datastore from 'nedb'
 import { Resolvers } from './__generated__/File'
 
 export default /* GraphQL */ `
@@ -27,9 +26,10 @@ export interface FileModel {
 export const FileResolvers: Resolvers = {
   File: {
     id: ({ _id }) => _id,
-    match: ({ matchId }, _, { db }) =>
-      db.promise(cb => db.matches.findOne({ _id: matchId }, cb)),
+    match: ({ matchId }, _, { data }) =>
+      data
+        .get('matches')
+        .find({ _id: matchId })
+        .value(),
   },
 }
-
-export const files = new Datastore<FileModel>()
