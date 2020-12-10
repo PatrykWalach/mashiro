@@ -1,11 +1,11 @@
 export default /* GraphQL */ `
-  type Match {
-    id: ID!
+  type Channel {
+    items: [Item!]!
   }
+
   type Item {
-    title: String!
     link: String!
-    id: ID!
+    id: String!
     pubDate: String!
     seeders: Int
     leechers: Int
@@ -17,8 +17,48 @@ export default /* GraphQL */ `
     comments: Int
     trusted: Boolean
     remake: Boolean
-    description: String!
-    match: Match
+    description: String
+
+    "anime_title by [anitomy-js](https://github.com/skiptirengu/anitomy-js)"
+    animeTitle: String
+    
+    "episode_number by [anitomy-js](https://github.com/skiptirengu/anitomy-js)"
+    episodeNumber: String
+    
+    "release_group by [anitomy-js](https://github.com/skiptirengu/anitomy-js)"
+    subgroup: String
+    
+    "video_resolution by [anitomy-js](https://github.com/skiptirengu/anitomy-js)"
+    videoResolution: String
+    
+    "file_name by [anitomy-js](https://github.com/skiptirengu/anitomy-js)"
+    fileName: String!
+
+    "file_extension by [anitomy-js](https://github.com/skiptirengu/anitomy-js)"
+    fileExtension: String
+
+    #anime_season?: string
+    #season_prefix?: string
+    #anime_type?: string
+    #anime_year?: string
+    #audio_term?: string
+    #device_compatibility?: string
+    #episode_number_alt?: string
+    #episode_prefix?: string
+    #episode_title?: string
+    #file_checksum?: string
+    #language?: string
+    #other?: string
+    #release_group?: string
+    #release_information?: string
+    #release_version?: string
+    #source?: string
+    #subtitles?: string
+    #video_resolution?: string
+    #video_term?: string
+    #volume_number?: string
+    #volume_prefix?: string
+    #unknown?: string
   }
 `
 
@@ -27,35 +67,25 @@ export interface ItemModel {
   title: string
   link: string
   pubDate: string
-  'nyaa:seeders'?: number
-  'nyaa:leechers'?: number
-  'nyaa:downloads'?: number
-  'nyaa:infoHash'?: string
-  'nyaa:categoryId'?: string
-  'nyaa:category'?: string
+  seeders?: number
+  leechers?: number
+  downloads?: number
+  infoHash?: string
+  categoryId?: string
   category?: string
-  'nyaa:size'?: string
-  'nyaa:comments'?: number
-  'nyaa:trusted'?: string
-  'nyaa:remake'?: string
-  description: string
+  size?: string
+  comments?: number
+  trusted?: string
+  remake?: string
+  description?: string
+
+  mediaId?: number
 }
 
-import { checkUndefined, keyToBoolean } from '../util'
 import { Resolvers } from './__generated__/Item'
 
 export const ItemResolvers: Resolvers = {
   Item: {
     id: ({ guid }) => guid,
-    trusted: itemModel => keyToBoolean(itemModel, 'nyaa:trusted'),
-    remake: itemModel => keyToBoolean(itemModel, 'nyaa:remake'),
-    seeders: itemModel => checkUndefined(itemModel['nyaa:seeders']),
-    leechers: itemModel => checkUndefined(itemModel['nyaa:leechers']),
-    downloads: itemModel => checkUndefined(itemModel['nyaa:downloads']),
-    infoHash: itemModel => checkUndefined(itemModel['nyaa:infoHash']),
-    categoryId: itemModel => checkUndefined(itemModel['nyaa:categoryId']),
-    category: itemModel => checkUndefined(itemModel['nyaa:category']),
-    size: itemModel => checkUndefined(itemModel['nyaa:size']),
-    comments: itemModel => checkUndefined(itemModel['nyaa:comments']),
   },
 }

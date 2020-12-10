@@ -1,15 +1,9 @@
-import { app } from 'electron'
-import { join } from 'path'
 import { Resolvers } from './__generated__/MashiroActivity'
 
 export default /* GraphQL */ `
-  type Match {
-    id: ID!
-  }
-
   interface MashiroActivity {
     id: String!
-    mediaTitle: String!
+    title: String!
     episode: Int!
     className: String!
     startedAt: Int!
@@ -17,32 +11,29 @@ export default /* GraphQL */ `
 
   type PastActivity implements MashiroActivity {
     id: String!
-    mediaTitle: String!
+    title: String!
     episode: Int!
     className: String!
     startedAt: Int!
     completedAt: Int!
     uploadedAt: Int!
-    match: Match!
   }
 
   type PendingActivity implements MashiroActivity {
     id: String!
-    mediaTitle: String!
+    title: String!
     episode: Int!
     className: String!
     startedAt: Int!
     completedAt: Int!
-    match: Match
   }
 
   type CurrentActivity implements MashiroActivity {
     id: String!
-    mediaTitle: String!
+    title: String!
     episode: Int!
     className: String!
     startedAt: Int!
-    match: Match
   }
 
   type Query {
@@ -51,8 +42,8 @@ export default /* GraphQL */ `
 `
 
 interface MashiroActivityModel {
-  _id: string
-  mediaTitle: string
+  id: string
+  title: string
   episode: number
   className: string
   startedAt: number
@@ -61,16 +52,16 @@ interface MashiroActivityModel {
 export interface PastActivityModel extends MashiroActivityModel {
   completedAt: number
   uploadedAt: number
-  matchId: string
+  mediaId: number
 }
 
 export interface PendingActivityModel extends MashiroActivityModel {
   completedAt: number
-  matchId?: string
+  mediaId?: number
 }
 
 export interface CurrentActivityModel extends MashiroActivityModel {
-  matchId?: string
+  mediaId?: number
 }
 
 export const MashiroActivityResolvers: Resolvers = {
@@ -85,31 +76,7 @@ export const MashiroActivityResolvers: Resolvers = {
       return 'CurrentActivity'
     },
   },
-  PastActivity: {
-    id: ({ _id }) => _id,
-    match: ({ matchId }, _, { data }) =>
-      data
-        .get('matches')
-        .find({ _id: matchId })
-        .value(),
-  },
-  PendingActivity: {
-    id: ({ _id }) => _id,
-    match: ({ matchId }, _, { data }) =>
-      data
-        .get('matches')
-        .find({ _id: matchId })
-        .value(),
-  },
-  CurrentActivity: {
-    id: ({ _id }) => _id,
-    match: ({ matchId }, _, { data }) =>
-      data
-        .get('matches')
-        .find({ _id: matchId })
-        .value(),
-  },
   Query: {
-    Activities: (_, __, { data }) => data.get('activities').value(),
+    Activities: (_, __, { data }) => data.get('activities').values().value(),
   },
 }

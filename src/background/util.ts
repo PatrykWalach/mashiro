@@ -9,7 +9,9 @@ import {
   VariableNode,
 } from 'graphql'
 import fetch from 'cross-fetch'
+import Dataloader from 'dataloader'
 
+import { AnitomyResult, parse } from 'anitomy-js'
 import {
   linkToExecutor,
   loadSchema,
@@ -64,7 +66,7 @@ export const diff = <T>(
 }
 
 export const isString = (t: unknown): t is string =>
-  typeof t === 'string' || t instanceof String
+  typeof t === 'string' || t instanceof (String as any)
 
 export const keyToBoolean = <T>(item: T, key: keyof T) => {
   if (!(key in item)) {
@@ -81,7 +83,7 @@ export const checkUndefined = <T>(value: T | undefined): T | null =>
   value === undefined ? null : value
 
 export const valuesFromResults = <Id extends string | symbol | number>(
-  id: Id,
+  id_: Id,
 ) => <
   K extends string | symbol | number,
   T extends {
@@ -92,7 +94,7 @@ export const valuesFromResults = <Id extends string | symbol | number>(
   keys: readonly K[],
 ): (T | null)[] => {
   const mediaIdToIndex: Record<K, number> = Object.fromEntries(
-    media.map((result, i) => [[result[id]], i]),
+    media.map((result, i) => [[result[id_]], i]),
   )
 
   return keys.map(id => media[mediaIdToIndex[id]] || null)

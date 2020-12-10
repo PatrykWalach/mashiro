@@ -3,8 +3,7 @@ import { GraphQLSchema } from 'graphql'
 import { makeExecutableSchema, stitchSchemas } from 'graphql-tools'
 import typeDefs from './types'
 import resolvers from './resolvers'
-// const { merge } = require('./entities/anilist')
-import { Media } from './entities/anilist'
+import { Media as mergeMedia } from './entities/anilist'
 import { graphqlHTTP } from 'express-graphql'
 import cors from 'cors'
 import { createRemoteSchema } from './util'
@@ -22,7 +21,7 @@ export const createSchema = async () => {
     batchingOptions: {
       dataLoaderOptions: { maxBatchSize: 50 },
     },
-    merge: { Media },
+    merge: { Media: mergeMedia },
   })
 
   const schema = stitchSchemas({
@@ -32,13 +31,13 @@ export const createSchema = async () => {
         merge: {
           Media: {
             selectionSet: '{ id }',
-            computedFields: {
-              alternativeTitles: { selectionSet: '{ id }' },
-              episodeOffset: { selectionSet: '{ id }' },
-              files: { selectionSet: '{ id }' },
-            },
+            // computedFields: {
+            //   alternativeTitles: { selectionSet: '{ id }' },
+            //   episodeOffset: { selectionSet: '{ id }' },
+            //   files: { selectionSet: '{ id }' },
+            // },
             fieldName: '_media',
-            key: ({ id }) => ({ id }),
+            key: ({ id }) => id,
             argsFromKeys: id_in => ({ id_in }),
           },
         },
