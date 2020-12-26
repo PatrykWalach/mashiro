@@ -1,32 +1,20 @@
-import {
-  Kind,
-  ListTypeNode,
-  NamedTypeNode,
-  NameNode,
-  print,
-  TypeNode,
-  VariableDefinitionNode,
-  VariableNode,
-} from 'graphql'
+// import { print } from 'graphql'
 import fetch from 'cross-fetch'
-import Dataloader from 'dataloader'
-
-import { AnitomyResult, parse } from 'anitomy-js'
 import {
   linkToExecutor,
   loadSchema,
   UrlLoader,
   SubschemaConfig,
-  WrapQuery,
   Transform,
-  Request,
-  DelegationContext,
   MergedTypeResolverOptions,
   MergedTypeResolver,
   batchDelegateToSchema,
 } from 'graphql-tools'
 
-import { ApolloLink, HttpLink } from '@apollo/client'
+import {
+  //ApolloLink,
+  HttpLink,
+} from '@apollo/client'
 
 export const diff = <T>(
   prev: T[],
@@ -66,7 +54,7 @@ export const diff = <T>(
 }
 
 export const isString = (t: unknown): t is string =>
-  typeof t === 'string' || t instanceof (String as any)
+  typeof t === 'string' || t instanceof String
 
 export const keyToBoolean = <T>(item: T, key: keyof T) => {
   if (!(key in item)) {
@@ -78,9 +66,6 @@ export const keyToBoolean = <T>(item: T, key: keyof T) => {
   }
   return null
 }
-
-export const checkUndefined = <T>(value: T | undefined): T | null =>
-  value === undefined ? null : value
 
 export const valuesFromResults = <Id extends string | symbol | number>(
   id_: Id,
@@ -96,8 +81,17 @@ export const valuesFromResults = <Id extends string | symbol | number>(
   const mediaIdToIndex: Record<K, number> = Object.fromEntries(
     media.map((result, i) => [[result[id_]], i]),
   )
-
-  return keys.map(id => media[mediaIdToIndex[id]] || null)
+  // console.log(media)
+  return keys.map(
+    id => media[mediaIdToIndex[id]] || null,
+    //   {
+    //   const m = media[mediaIdToIndex[id]]
+    //   if (m === null) {
+    //     return null
+    //   }
+    //   return JSON.parse(JSON.stringify(m))
+    // }
+  )
 }
 
 export const createRemoteSchema = async ({
@@ -106,147 +100,19 @@ export const createRemoteSchema = async ({
 }: Omit<SubschemaConfig, 'schema' | 'executor'> & { uri: string }) => ({
   ...settings,
   executor: linkToExecutor(
-    ApolloLink.from([
-      new ApolloLink((operation, forward) => {
-        console.log(print(operation.query))
-        console.log(operation.variables)
-        return forward(operation)
-      }),
-      new HttpLink({ uri, fetch }),
-    ]),
+    // ApolloLink.from([
+    //   new ApolloLink((operation, forward) => {
+    //     console.log(print(operation.query))
+    //     console.log(operation.variables)
+    //     return forward(operation)
+    //   }),
+    new HttpLink({ uri, fetch }),
+    // ]),
   ),
   schema: await loadSchema(uri, {
     loaders: [new UrlLoader()],
   }),
 })
-
-const normalizeAnitomyResult = ({
-  anime_title,
-  episode_number,
-  video_resolution,
-  release_group,
-  file_name,
-}: AnitomyResult) => ({
-  animeTitle: anime_title,
-  episodeNumber: episode_number,
-  videoResolution: video_resolution,
-  subgroup: release_group,
-  fileName: file_name,
-})
-
-export const anitomyLoader = new Dataloader(
-  async ([...titles]: readonly string[]) => {
-    const results = await parse(titles)
-    return results.map(normalizeAnitomyResult)
-  },
-)
-
-export const List = (type: TypeNode): ListTypeNode => ({
-  kind: Kind.LIST_TYPE,
-  type,
-})
-
-const Name = (name: string): NameNode => ({
-  kind: Kind.NAME,
-  value: name,
-})
-
-const Type = (typeName: string): NamedTypeNode => ({
-  kind: Kind.NAMED_TYPE,
-  name: Name(typeName),
-})
-
-export const Int: TypeNode = Type('Int')
-export const String: TypeNode = Type('String')
-
-const Variable = (variableName: string): VariableNode => ({
-  kind: Kind.VARIABLE,
-  name: Name(variableName),
-})
-
-interface WrapQueryWithFieldOptions {
-  path: string[]
-  fieldName: string
-  arguments: Record<string, string>
-}
-export class WrapQueryWithField extends WrapQuery {
-  constructor({
-    path,
-    fieldName,
-    arguments: args = {},
-  }: WrapQueryWithFieldOptions) {
-    const fieldArguments = Object.entries(args).map(
-      ([argumentName, variableName]) => ({
-        kind: Kind.ARGUMENT,
-        name: Name(argumentName),
-        value: Variable(variableName),
-      }),
-    )
-
-    super(
-      path,
-      selectionSet => ({
-        kind: Kind.FIELD,
-        name: Name(fieldName),
-        arguments: fieldArguments,
-        selectionSet,
-      }),
-      r => r && r[fieldName],
-    )
-  }
-}
-
-interface AddQueryVariablesOption {
-  from: string
-  type: TypeNode
-}
-
-type AddQueryVariablesOptions = Record<string, AddQueryVariablesOption>
-
-export class AddQueryVariables implements Transform {
-  optionsEntries: [string, AddQueryVariablesOption][]
-  variables: VariableDefinitionNode[]
-
-  constructor(options: AddQueryVariablesOptions) {
-    this.optionsEntries = Object.entries(options)
-    this.variables = this.optionsEntries.map(([variableName, { type }]) => ({
-      kind: Kind.VARIABLE_DEFINITION,
-      type,
-      variable: Variable(variableName),
-    }))
-  }
-
-  transformRequest(request: Request, context: DelegationContext): Request {
-    const variables = Object.fromEntries(
-      this.optionsEntries.map(([variableName, { from }]) => [
-        variableName,
-        context.args[from],
-      ]),
-    )
-
-    return {
-      ...request,
-      variables,
-      document: {
-        ...request.document,
-        definitions: request.document.definitions.map(def => {
-          if (def.kind !== Kind.OPERATION_DEFINITION) {
-            return def
-          }
-          if (def.operation !== 'query') {
-            return def
-          }
-          return {
-            ...def,
-            variableDefinitions: this.variables.concat(
-              def.variableDefinitions || [],
-            ),
-          }
-        }),
-      },
-    }
-  }
-}
 
 interface MergedTypeResolverWithTransformOptions
   extends MergedTypeResolverOptions {

@@ -80,8 +80,7 @@ if (isDevelopment) {
   }
 }
 
-import { createSchema, createServer } from './background/server'
-import { createContext } from './background/context'
+import { createServer } from './background/server'
 
 app.on('before-quit', async () => {
   console.log('quit')
@@ -90,35 +89,31 @@ app.on('before-quit', async () => {
 process.dlopen = () => {
   throw new Error('Load native module is not safe')
 }
-
 // import { Worker } from 'worker_threads'
 // import { execute, graphql, print } from 'graphql'
 
 // const tracker = new Worker(join(__dirname, 'tracker.worker.js'))
 
-const port = 5000
+const PORT = 5000
+;(async () => {
+  // const server =
+  await createServer(PORT)
 
-Promise.all([createContext(), createSchema()]).then(
-  async ([context, schema]) => {
-    createServer(schema, port, context)
-
-    // tracker.on('message', event => {
-    //   console.log(event)
-    //   if (event.type === 'players-opened') {
-    //     graphql(
-    //       schema,
-    //       print(gql`
-    //     mutation AddPlayer(){
-    //       id
-    //     }
-    //     `),
-    //     )
-    //   } else if (event.type === 'players-closed') {
-    //   }
-    // })
-
-    // app.on('before-quit', async () => {
-    //   await tracker.terminate()
-    // })
-  },
-)
+  // tracker.on('message', event => {
+  //   console.log(event)
+  //   if (event.type === 'players-opened') {
+  //     graphql(
+  //       schema,
+  //       print(gql`
+  //     mutation AddPlayer(){
+  //       id
+  //     }
+  //     `),
+  //     )
+  //   } else if (event.type === 'players-closed') {
+  //   }
+  // })
+  // app.on('before-quit', async () => {
+  //   await tracker.terminate()
+  // })
+})()

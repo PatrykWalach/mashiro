@@ -1,78 +1,31 @@
-import express from 'express'
-import { GraphQLSchema } from 'graphql'
-import { makeExecutableSchema, stitchSchemas } from 'graphql-tools'
-import typeDefs from './types'
-import resolvers from './resolvers'
-import { Media as mergeMedia } from './entities/anilist'
-import { graphqlHTTP } from 'express-graphql'
-import cors from 'cors'
-import { createRemoteSchema } from './util'
-import { Context } from '@apollo/client'
+import { stitchSchemas } from 'graphql-tools'
 
-export const createSchema = async () => {
-  const electronSchema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
-  })
+import { ApolloServer } from 'apollo-server'
+import { electronSubschema } from './schemas/electron'
+import { anilistSubschema as createAnilistSubschema } from './schemas/anilist'
+import { createContext } from './context'
 
-  const anilistSubschema = await createRemoteSchema({
-    uri: 'https://graphql.anilist.co',
-    batch: true,
-    batchingOptions: {
-      dataLoaderOptions: { maxBatchSize: 50 },
-    },
-    merge: { Media: mergeMedia },
-  })
+export const createServer = async (port: number) => {
+  const [anilistSubchema, context] = await Promise.all([
+    createAnilistSubschema(),
+    createContext(),
+  ])
 
   const schema = stitchSchemas({
-    subschemas: [
-      {
-        schema: electronSchema,
-        merge: {
-          Media: {
-            selectionSet: '{ id }',
-            // computedFields: {
-            //   alternativeTitles: { selectionSet: '{ id }' },
-            //   episodeOffset: { selectionSet: '{ id }' },
-            //   files: { selectionSet: '{ id }' },
-            // },
-            fieldName: '_media',
-            key: ({ id }) => id,
-            argsFromKeys: id_in => ({ id_in }),
-          },
-        },
-      },
-      anilistSubschema,
-    ],
+    subschemas: [electronSubschema, anilistSubchema],
   })
 
-  return schema
-}
+  const server = new ApolloServer({
+    schema,
+    context,
+  })
 
-export const createServer = async (
-  schema: GraphQLSchema,
-  port: number,
-  context: Context,
-) => {
-  const app = express()
+  await server.listen(port, () => {
+    console.log(`Server ready at http://localhost:${port}${server.graphqlPath}`)
+    console.log(
+      `Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`,
+    )
+  })
 
-  app.use(
-    '/graphql',
-    cors(),
-    graphqlHTTP({
-      schema,
-      graphiql: true,
-      context,
-    }),
-  )
-
-  app.listen(port, () =>
-    console.info(
-      `Running a GraphQL API server at http://localhost:${port}/graphql`,
-    ),
-  )
-
-  // graphql(schema, query)
-
-  return app
+  return server
 }

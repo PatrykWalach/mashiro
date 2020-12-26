@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+  //  "file:./dev.db"
+}
+
+model Activity {
+  className       String   @map("class_name")
+  animeTitle      String?  @map("anime_title")
+  episodeNumber   String?  @map("episode_number")
+  subgroup        String?
+  videoResolution String?  @map("video_resolution")
+  fileName        String   @map("file_name")
+  fileExtension   String?  @map("file_extension")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  mediaId         Int?     @map("media_id")
+  status          Int      @default(0)
+  media           Media?   @relation(fields: [mediaId], references: [id])
+}
+
+model Media {
+  id            Int        @id
+  episodeOffset Int?       @default(0) @map("episode_offset")
+  activities    Activity[]
+}
+
+model User {
+  id                  Int    @id
+  preferredRssFeedUri String @default("https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0") @map("preferred_rss_feed_uri")
+}
+

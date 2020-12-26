@@ -1,7 +1,17 @@
-// const ThreadsPlugin = require('threads-plugin')
-// const WorkerPlugin = require('worker-plugin')
+/* eslint-disable @typescript-eslint/no-var-requires*/
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 
 module.exports = {
+  configureWebpack: {
+    plugins: [
+      new CircularDependencyPlugin({
+        exclude: /node_modules/,
+        failOnError: true,
+        allowAsyncCycles: false,
+        cwd: process.cwd(),
+      }),
+    ],
+  },
   pluginOptions: {
     electronBuilder: {
       chainWebpackMainProcess: config =>
@@ -10,7 +20,17 @@ module.exports = {
           .add('./src/background/tracker.ts')
           .end(),
       // nodeIntegration: true,
-      externals: ['ffi-napi', 'graphql-tools', 'graphql'],
+      experimentalNativeDepCheck: true,
+      externals: [
+        // 'ffi-napi',
+        'graphql-tools',
+        // 'graphql',
+        'apollo-server',
+        '@prisma/client',
+        // 'anitomy-js',
+        'nexus-plugin-prisma',
+        'nexus',
+      ],
       mainProcessWatch: ['src/background/**/*'],
     },
   },

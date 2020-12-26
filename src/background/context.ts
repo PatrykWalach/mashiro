@@ -1,52 +1,37 @@
 import { FileModel } from './entities/File'
-import {
-  CurrentActivityModel,
-  PendingActivityModel,
-  PastActivityModel,
-} from './entities/MashiroActivity'
-import { MediaModel } from './entities/Media'
-// import { MatchModel } from './entities/Match'
-import Lowdb, { LowdbAsync, LowdbSync } from 'lowdb'
-import FileAsync from 'lowdb/adapters/FileAsync'
+import Lowdb from 'lowdb'
 import Memory from 'lowdb/adapters/Memory'
-import { join } from 'path'
-import { app } from 'electron'
-
-type Entries<T> = {
-  [key: string]: T //| undefined
-}
-
-export interface Data {
-  media: Entries<MediaModel>
-  activities: Entries<
-    CurrentActivityModel | PendingActivityModel | PastActivityModel
-  >
-  // matches: Entries<number>
-}
+import { PubSub } from 'apollo-server'
+import { PrismaClient, PromiseReturnType } from '@prisma/client'
 
 export interface Session {
-  files: Entries<FileModel>
-}
-export interface Context {
-  data: LowdbAsync<Data>
-  session: LowdbSync<Session>
+  files: FileModel[]
 }
 
-export const createContext = async (): Promise<Context> => ({
-  data: await Lowdb(
-    new FileAsync<Data>(join(app.getPath('appData'), 'mashiro', 'data.db'), {
-      defaultValue: {
-        media: {},
-        activities: {},
-        // matches: {},
-      },
-    }),
-  ),
-  session: await Lowdb(
-    new Memory<Session>('', {
-      defaultValue: {
-        files: {},
-      },
-    }),
-  ),
-})
+enum Events {
+  ACTIVITY_UPDATED = 'ACTIVITY_UPDATED',
+  ACTIVITY_ADDED = 'ACTIVITY_ADDED',
+}
+
+import { anitomyLoader, mediaIdLoader } from './loaders'
+
+export const createContext = async () => {
+  return {
+    events: Events,
+    pubsub: new PubSub(),
+    prisma: new PrismaClient(),
+    anitomyLoader,
+    mediaIdLoader,
+    session: await Lowdb(
+      new Memory<Session>('', {
+        defaultValue: {
+          files: [],
+        },
+      }),
+    ),
+  }
+}
+// export interface Context {
+//   prisma: PrismaClient
+// }
+export type Context = PromiseReturnType<typeof createContext>

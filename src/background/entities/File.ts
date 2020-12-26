@@ -1,34 +1,45 @@
-import { Resolvers } from './__generated__/File'
-
-export default /* GraphQL */ `
-  type Media {
-    files: [File]
-  }
-
-  type File {
-    id: ID!
-    path: String!
-    name: String!
-    title: String!
-    episode: Int!
-  }
-`
-
+import { join } from 'path'
+import { extendType, objectType } from 'nexus'
 export interface FileModel {
   id: string
   path: string
-  name: string
+  // name: string
   mediaId?: number
-  title: string
-  episode: number
+  fileName: string
+  // episode: number
 }
 
-export const FileResolvers: Resolvers = {
-  Media: {
-    files: ({ id }, _, { data, session }) =>
-      session
-        .get('files')
-        .filter({ mediaId: id })
-        .value(),
+const ExtendMedia = extendType({
+  type: 'Media',
+  definition(t) {
+    t.nonNull.list.field('files', {
+      type: 'File',
+      resolve: ({ id }, _, { session }) =>
+        session
+          .get('files')
+          .filter({ mediaId: id })
+          .value(),
+    })
   },
+})
+
+const FileType = objectType({
+  name: 'File',
+  definition(t) {
+    t.nonNull.id('id')
+    t.nonNull.string('path')
+    // t.nonNull.string('name')
+    // t.nonNull.string('title')
+    // t.nonNull.int('episode')
+    t.implements('AnitomyResult')
+  },
+  sourceType: {
+    module: join(__dirname, '../src/background/entities/File.ts'),
+    export: 'FileModel',
+  },
+})
+
+export const File = {
+  ExtendMedia,
+  FileType,
 }
