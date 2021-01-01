@@ -9,7 +9,7 @@ const UserType = objectType({
   },
 })
 
-const UserQuery = queryField(t => {
+const UserQuery = queryField((t) => {
   t.crud.users({
     pagination: false,
     filtering: { id: true },

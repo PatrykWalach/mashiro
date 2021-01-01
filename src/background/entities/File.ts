@@ -15,10 +15,7 @@ const ExtendMedia = extendType({
     t.nonNull.list.field('files', {
       type: 'File',
       resolve: ({ id }, _, { session }) =>
-        session
-          .get('files')
-          .filter({ mediaId: id })
-          .value(),
+        session.get('files').filter({ mediaId: id }).value(),
     })
   },
 })

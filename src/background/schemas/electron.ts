@@ -13,7 +13,7 @@ import { join } from 'path'
 import { valuesFromResults } from '../util'
 
 const schema = makeSchema({
-  shouldExitAfterGenerateArtifacts: process.argv.includes('--nexus-exit'),
+  // shouldExitAfterGenerateArtifacts: process.argv.includes('--nexus-exit'),
   types: [Feed, Media, File, Activity, AnitomyResult, User],
   plugins: [
     nexusPrisma({
@@ -33,7 +33,7 @@ const schema = makeSchema({
   },
   outputs: {
     typegen: join(__dirname, '../node_modules/@types/nexus-typegen/index.d.ts'),
-    schema: join(__dirname, '../schema.graphql'),
+    // schema: join(__dirname, '../schema.graphql'),
   },
   sourceTypes: {
     modules: [
@@ -53,14 +53,14 @@ export const electronSubschema: SubschemaConfig = {
       selectionSet: '{ id }',
       fieldName: 'media',
       key: ({ id }) => id,
-      argsFromKeys: ids => ({ where: { id: { in: ids } } }),
+      argsFromKeys: (ids) => ({ where: { id: { in: ids } } }),
       valuesFromResults: valuesFromResults('id'),
     },
     User: {
       selectionSet: '{ id }',
       fieldName: 'users',
       key: ({ id }) => id,
-      argsFromKeys: ids => ({ where: { id: { in: ids } } }),
+      argsFromKeys: (ids) => ({ where: { id: { in: ids } } }),
       valuesFromResults: valuesFromResults('id'),
     },
   },

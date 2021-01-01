@@ -70,10 +70,10 @@ export declare interface Win32Tracker {
 const playersComparator = (a: Player, b: Player) => a.id.localeCompare(b.id)
 
 const createIsPlayer = () => {
-  const regexp = new RegExp(state.extensions.map(ext => `.${ext}`).join('|'))
+  const regexp = new RegExp(state.extensions.map((ext) => `.${ext}`).join('|'))
 
   return ({ className, title }: Player) =>
-    state.players.some(playerName => className.includes(playerName)) &&
+    state.players.some((playerName) => className.includes(playerName)) &&
     regexp.test(title)
 }
 
@@ -96,9 +96,7 @@ export class Win32Tracker extends EventEmitter {
   private updatePlayers() {
     const isPlayer = createIsPlayer()
 
-    const nextPlayers = getWindows()
-      .filter(isPlayer)
-      .sort(playersComparator)
+    const nextPlayers = getWindows().filter(isPlayer).sort(playersComparator)
 
     const [opened, closed] = diff(
       this.prevPlayers,

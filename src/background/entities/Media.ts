@@ -54,7 +54,7 @@ const ExtendActivity = extendType({
   },
 })
 
-const MediaQuery = queryField(t =>
+const MediaQuery = queryField((t) =>
   t.crud.media({
     filtering: { id: true },
     pagination: false,

@@ -5,7 +5,6 @@ generator client {
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
-  //  "file:./dev.db"
 }
 
 model Activity {
@@ -24,13 +23,12 @@ model Activity {
 }
 
 model Media {
-  id            Int        @id
+  id            Int        @id @default(autoincrement())
   episodeOffset Int?       @default(0) @map("episode_offset")
   activities    Activity[]
 }
 
 model User {
-  id                  Int    @id
+  id                  Int    @id @default(autoincrement())
   preferredRssFeedUri String @default("https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0") @map("preferred_rss_feed_uri")
 }
-

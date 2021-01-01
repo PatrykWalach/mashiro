@@ -5,11 +5,11 @@ const tracker = new Win32Tracker()
 console.log('thread-working')
 parentPort && parentPort.postMessage({ type: 'thread-working' })
 
-tracker.on('players-closed', payload => {
+tracker.on('players-closed', (payload) => {
   parentPort && parentPort.postMessage({ type: 'players-closed', payload })
 })
 
-tracker.on('players-opened', payload => {
+tracker.on('players-opened', (payload) => {
   parentPort &&
     parentPort.postMessage({
       type: 'players-opened',

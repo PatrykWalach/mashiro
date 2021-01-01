@@ -14,17 +14,15 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
-      chainWebpackMainProcess: config =>
-        config
-          .entry('tracker.worker')
-          .add('./src/background/tracker.ts')
-          .end(),
+      // mainProcessTypeChecking: true,
+      chainWebpackMainProcess: (config) =>
+        config.entry('tracker.worker').add('./src/background/tracker.ts').end(),
       // nodeIntegration: true,
       experimentalNativeDepCheck: true,
       externals: [
         // 'ffi-napi',
         'graphql-tools',
-        // 'graphql',
+        'graphql',
         'apollo-server',
         '@prisma/client',
         // 'anitomy-js',

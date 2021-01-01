@@ -53,10 +53,10 @@ export class AddFields extends TransformQuery {
 
     super({
       path,
-      queryTransformer: selectionSet => ({
+      queryTransformer: (selectionSet) => ({
         ...selectionSet,
         selections: [
-          ...fields.map(name => ({ kind: Kind.FIELD, name: Name(name) })),
+          ...fields.map((name) => ({ kind: Kind.FIELD, name: Name(name) })),
           ...selectionSet.selections,
         ],
       }),
@@ -80,13 +80,13 @@ export class WrapQueryWithField extends WrapQuery {
 
     super(
       path,
-      selectionSet => ({
+      (selectionSet) => ({
         kind: Kind.FIELD,
         name: Name(fieldName),
         arguments: fieldArguments,
         selectionSet,
       }),
-      r => r && r[fieldName],
+      (r) => r && r[fieldName],
     )
   }
 }
@@ -124,7 +124,7 @@ export class AddQueryVariables implements Transform {
       variables,
       document: {
         ...request.document,
-        definitions: request.document.definitions.map(def => {
+        definitions: request.document.definitions.map((def) => {
           if (def.kind !== Kind.OPERATION_DEFINITION) {
             return def
           }

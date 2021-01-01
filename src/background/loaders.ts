@@ -11,7 +11,7 @@ export const anilistExecutor = linkToExecutor(
 
 const GET_MEDIA_ID = gql`
   query UtilGetMediaId($search: String!) {
-    Media(search: $search, sort: SEARCH_MATCH, type: ANIME) {
+    anilistMedia(search: $search, sort: SEARCH_MATCH, type: ANIME) {
       id
     }
   }
@@ -35,7 +35,7 @@ const getMediaId = async (title: string | undefined) => {
     document: GET_MEDIA_ID,
   })
 
-  return data && data.Media && data.Media.id
+  return data && data.anilistMedia && data.anilistMedia.id
 }
 
 export const mediaIdLoader = new DataLoader(

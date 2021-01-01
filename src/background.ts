@@ -2,7 +2,10 @@
 
 import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, {
+  APOLLO_DEVELOPER_TOOLS,
+  // VUEJS_DEVTOOLS,
+} from 'electron-devtools-installer'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -19,8 +22,9 @@ async function createWindow() {
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: (process.env
-        .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
+      // nodeIntegration: (process.env
+      // .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
+      contextIsolation: true,
     },
   })
 
@@ -57,7 +61,14 @@ app.on('ready', async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
-      await installExtension(VUEJS_DEVTOOLS)
+      // await installExtension(VUEJS_DEVTOOLS)
+      await Promise.allSettled([
+        installExtension({
+          electron: '11.1',
+          id: 'ljjemllljcmogpfapbkkighbhhppjdbg',
+        }),
+        installExtension(APOLLO_DEVELOPER_TOOLS),
+      ])
     } catch (e) {
       console.error('Vue Devtools failed to install:', e.toString())
     }
@@ -68,7 +79,7 @@ app.on('ready', async () => {
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {
-    process.on('message', data => {
+    process.on('message', (data) => {
       if (data === 'graceful-exit') {
         app.quit()
       }
@@ -86,9 +97,10 @@ app.on('before-quit', async () => {
   console.log('quit')
 })
 
-process.dlopen = () => {
-  throw new Error('Load native module is not safe')
-}
+// process.dlopen = () => {
+//   throw new Error('Load native module is not safe')
+// }
+
 // import { Worker } from 'worker_threads'
 // import { execute, graphql, print } from 'graphql'
 

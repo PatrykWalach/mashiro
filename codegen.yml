@@ -1,78 +1,43 @@
 require:
   - ts-node/register
-# schema:
-#   - https://graphql.anilist.co
+schema:
+  # - https://graphql.anilist.co
+  - schema.graphql
+    # - http://localhost:5000
+hooks:
+  afterOneFileWrite:
+    - vue-cli-service lint
 config:
-  noSchemaStitching: true
+  # noSchemaStitching: false
   namingConvention:
-    # enumValues: 'upper-case#upperCase'
-    enumValues: '@prisma/client#ActivityStatus'
-  contextType: ../../context#Context
-  mappers:
-    # showUnusedMappers: true
-    Channel: ../Channel#ChannelModel
-    Item: ../Item#ItemModel
-    Media: '@prisma/client#Media'
-    MashiroActivity: '@prisma/client#Activity'
-    File: ../File#FileModel
+    enumValues: upper-case#upperCase
+    # typeNames: change-case#kebab-case
 generates:
-  ./src/background/entities/__generated__/Media.ts:
-    schema:
-      - src/background/entities/Media.ts
+  # ./src/__generated__/globalTypes.ts:
+  #   plugins:
+  #     - typescript
+  ./src/__generated__/instrospection.ts:
     plugins:
-      - typescript
-      - typescript-resolvers
-    # config:
-    # mappers:
-    # Media: ../Media#MediaModel
-  ./src/background/entities/__generated__/File.ts:
-    schema:
-      - src/background/entities/File.ts
+      - fragment-matcher
+  ./src/__generated__/client.ts:
     plugins:
-      - typescript
-      - typescript-resolvers
-  ./src/background/entities/__generated__/MashiroActivity.ts:
-    schema:
-      - src/background/entities/MashiroActivity.ts
-    plugins:
-      - typescript
-      - typescript-resolvers
-  ./src/background/entities/__generated__/Channel.ts:
-    schema:
-      - src/background/entities/Channel.ts
-    plugins:
-      - typescript
-      - typescript-resolvers
-  ./src/background/entities/__generated__/Item.ts:
-    schema:
-      - src/background/entities/Item.ts
-    plugins:
-      - typescript
-      - typescript-resolvers
-      # enumValues:
-      #   ActivityWeekday:
-      #     MONDAY: 'poniedziałek'
-      #     TUESDAY: 'wtorek'
-      #     WEDNESDAY: 'środa'
-      #     THURSDAY: 'czwartek'
-      #     FRIDAY: 'piątek'
+      - typescript-apollo-client-helpers
   ./src/__generated__/globalTypes.ts:
     schema:
-      - https://graphql.anilist.co
+      - 'directive @connection(key: String, filter: [String!]) on FIELD'
+    # preset: near-operation-file
+    # presetConfig:
+    #   folder: __generated__
+    #   extension: .ts
+    #   baseTypesPath: __generated__/globalTypes.ts
+    # documents: src/**/!(__generated__)/*.ts
+    documents: src/**/*.vue
     plugins:
       - typescript
-  ./src/:
-    preset: near-operation-file
-    presetConfig:
-      folder: __generated__
-      extension: .ts
-      baseTypesPath: __generated__/globalTypes.ts
-    documents: src/**/!(__generated__|__entities__)/*.ts
-    schema:
-      - https://graphql.anilist.co
-    plugins:
       - typescript-operations
       - typescript-vue-apollo
     config:
+      immutableTypes: true
+      # exportFragmentSpreadSubTypes: true
       documentMode: documentNodeImportFragments
-  # - typescript-apollo-client-helpers
+      vueCompositionApiImportFrom: vue

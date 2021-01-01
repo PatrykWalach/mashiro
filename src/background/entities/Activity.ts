@@ -1,3 +1,4 @@
+import { Activity as A } from '@prisma/client'
 import {
   enumType,
   mutationField,
@@ -7,18 +8,18 @@ import {
   subscriptionField,
 } from 'nexus'
 
-const ActivitySubscribe = subscriptionField(t => {
+const ActivitySubscribe = subscriptionField((t) => {
   t.field('activityUpdated', {
-    type: 'ActivityUpdate',
+    type: nonNull('Activity'),
     subscribe: (_, __, { pubsub, events }) =>
       pubsub.asyncIterator([events.ACTIVITY_UPDATED]),
-    resolve: e => e,
+    resolve: (e: A) => e,
   })
   t.field('activityAdded', {
-    type: 'Activity',
+    type: nonNull('Activity'),
     subscribe: (_, __, { pubsub, events }) =>
       pubsub.asyncIterator([events.ACTIVITY_ADDED]),
-    resolve: e => e,
+    resolve: (e: A) => e,
   })
 })
 
@@ -28,9 +29,9 @@ enum ActivityStatus {
   UPDATED,
 }
 
-const ActivityMutation = mutationField(t => {
+const ActivityMutation = mutationField((t) => {
   t.field('finishActivity', {
-    type: 'Activity',
+    type: nonNull('Activity'),
     args: { id: nonNull('Int') },
     async resolve(_, { id }, { prisma, pubsub, events }) {
       const activityUpdated = await prisma.activity.update({
@@ -47,7 +48,7 @@ const ActivityMutation = mutationField(t => {
     },
   })
   t.field('updateActivityMedia', {
-    type: 'Activity',
+    type: nonNull('Activity'),
     args: { id: nonNull('Int'), mediaId: nonNull('Int') },
     resolve: (_, { id, mediaId }, { prisma }) =>
       prisma.activity.update({
@@ -63,7 +64,7 @@ const ActivityMutation = mutationField(t => {
       }),
   })
   t.field('createActivity', {
-    type: 'Activity',
+    type: nonNull('Activity'),
     args: { fullTitle: nonNull('String'), className: nonNull('String') },
     async resolve(
       _,
@@ -106,37 +107,36 @@ const ActivityMutation = mutationField(t => {
   })
 })
 
+// const ActivityUpdate = objectType({
+//   name: 'ActivityUpdate',
+//   definition(t) {
+//     t.nonNull.int('id')
+//     t.nonNull.string('updatedAt')
+//     t.nonNull.field('status', { type: 'ActivityStatus' })
+//   },
+// })
+
 export const AcivityType = objectType({
   name: 'Activity',
   definition(t) {
     t.implements('AnitomyResult')
+    // t.implements('ActivityUpdate')
     t.model.id()
+    t.model.updatedAt()
+    t.nonNull.field('status', { type: 'ActivityStatus' })
     t.model.animeTitle()
     t.model.className()
     t.model.media()
     t.model.episodeNumber()
     t.model.fileExtension()
     t.model.fileName()
-    t.nonNull.field('status', {
-      type: 'ActivityStatus',
-    })
     t.model.subgroup()
-    t.model.updatedAt()
     t.model.videoResolution()
     t.model.animeTitle()
   },
 })
 
-const ActivityUpdate = objectType({
-  name: 'ActivityUpdate',
-  definition(t) {
-    t.nonNull.int('id')
-    t.nonNull.string('updatedAt')
-    t.nonNull.field('status', { type: 'ActivityStatus' })
-  },
-})
-
-const ActivityQuery = queryField(t =>
+const ActivityQuery = queryField((t) =>
   t.crud.activities({
     ordering: { updatedAt: true, id: true },
     // filtering: { status: true },
@@ -145,7 +145,7 @@ const ActivityQuery = queryField(t =>
 
 export const Activity = {
   AcivityType,
-  ActivityUpdate,
+  // ActivityUpdate,
   ActivityQuery,
   ActivitySubscribe,
   ActivityMutation,
