@@ -23,12 +23,12 @@ model Activity {
 }
 
 model Media {
-  id            Int        @id @default(autoincrement())
+  id            Int        @id
   episodeOffset Int?       @default(0) @map("episode_offset")
   activities    Activity[]
 }
 
 model User {
-  id                  Int    @id @default(autoincrement())
+  id                  Int    @id
   preferredRssFeedUri String @default("https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0") @map("preferred_rss_feed_uri")
 }

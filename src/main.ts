@@ -6,6 +6,7 @@ import { DefaultApolloClient } from '@vue/apollo-composable'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { setContext } from '@apollo/client/link/context'
 
 import { TypedTypePolicies } from './__generated__/client'
 import instrospection from './__generated__/instrospection'
@@ -22,6 +23,18 @@ const typePolicies: TypedTypePolicies = {
   },
 }
 
+const authLink = setContext((_, { headers }) => {
+  const token =
+    process.env.VUE_APP_BEARER_TOKEN ?? localStorage.getItem('token')
+
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  }
+})
+
 const client = new ApolloClient({
   link: split(
     ({ query }) => {
@@ -37,7 +50,7 @@ const client = new ApolloClient({
         reconnect: true,
       },
     }),
-    new HttpLink({ uri: 'http://127.0.0.1:5000' }),
+    authLink.concat(new HttpLink({ uri: 'http://127.0.0.1:5000' })),
   ),
   cache: new InMemoryCache({
     possibleTypes: instrospection.possibleTypes,

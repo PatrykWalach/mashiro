@@ -34,4 +34,6 @@ export const createContext = async () => {
 // export interface Context {
 //   prisma: PrismaClient
 // }
-export type Context = PromiseReturnType<typeof createContext>
+export type Context = PromiseReturnType<typeof createContext> & {
+  authorization: string | null
+}

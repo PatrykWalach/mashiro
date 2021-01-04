@@ -1,4 +1,4 @@
-import { SubschemaConfig } from 'graphql-tools'
+import { delegateToSchema, SubschemaConfig } from 'graphql-tools'
 import { Feed } from '../entities/Feed'
 import { File } from '../entities/File'
 // import { Item } from '../entities/Item'
@@ -18,6 +18,21 @@ const schema = makeSchema({
   plugins: [
     nexusPrisma({
       experimentalCRUD: true,
+      // computedInputs: {
+      //   async user({ info, ctx }) {
+      //     const { id } = await delegateToSchema({
+      //       fieldName: 'anilistViewer',
+      //       info,
+      //       operation: 'query',
+      //       schema: info.schema,
+      //       context: ctx,
+      //     })
+
+      //     return typeof id === 'number'
+      //       ? { connectOrCreate: { where: { id }, create: { id } } }
+      //       : undefined
+      //   },
+      // },
     }),
   ],
   features: {

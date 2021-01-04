@@ -1,4 +1,12 @@
-import { MergedTypeConfig, RenameRootFields } from 'graphql-tools'
+import {
+  AsyncExecutor,
+  ExecutionParams,
+  Executor,
+  introspectSchema,
+  MergedTypeConfig,
+  RenameRootFields,
+  SubschemaConfig,
+} from 'graphql-tools'
 import {
   valuesFromResults,
   createMergeResolverWithTransform,
@@ -13,6 +21,9 @@ import {
   WrapQueryWithField,
 } from '../transforms'
 import { Media, User } from '@prisma/client'
+import { Context } from '../context'
+import { print } from 'graphql'
+import { fetch } from 'cross-fetch'
 
 interface Merge {
   Media: MergedTypeConfig<number, Media>
@@ -53,14 +64,44 @@ const merge: Merge = {
   },
 }
 
-export const anilistSubschema = () =>
-  createRemoteSchema({
-    uri: 'https://graphql.anilist.co',
+const executor: AsyncExecutor = async ({ document, variables, context }) =>
+  // : ExecutionParams<any, Context>
+  {
+    const query = print(document)
+    const fetchResult = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization:
+          (((context as unknown) as Context) &&
+            ((context as unknown) as Context).authorization) ||
+          '',
+      },
+      body: JSON.stringify({ query, variables }),
+    })
+    return fetchResult.json()
+  }
+
+export const anilistSubschema = async () =>
+  // : Promise<
+  //   SubschemaConfig<unknown, unknown, Context>
+  // >
+  ({
+    executor,
+    schema: await introspectSchema(executor),
     batch: true,
     batchingOptions: {
       dataLoaderOptions: { maxBatchSize: 50 },
     },
     merge,
     transforms: [new RenameRootFields((operation, name) => `anilist${name}`)],
-    // transforms: [new RenameTypes(name => `Anilist_${name}`)],
   })
+// createRemoteSchema({
+//   uri: 'https://graphql.anilist.co',
+//   batch: true,
+//   batchingOptions: {
+//     dataLoaderOptions: { maxBatchSize: 50 },
+//   },
+//   merge,
+//   transforms: [new RenameRootFields((operation, name) => `anilist${name}`)],
+// })

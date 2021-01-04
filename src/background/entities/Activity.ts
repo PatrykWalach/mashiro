@@ -42,7 +42,7 @@ const ActivityMutation = mutationField((t) => {
       })
 
       pubsub.publish(events.ACTIVITY_UPDATED, activityUpdated)
-      /*update list with activiry*/
+      /*update list with activity*/
 
       return activityUpdated
     },
@@ -63,6 +63,7 @@ const ActivityMutation = mutationField((t) => {
         },
       }),
   })
+
   t.field('createActivity', {
     type: nonNull('Activity'),
     args: { fullTitle: nonNull('String'), className: nonNull('String') },
@@ -83,20 +84,20 @@ const ActivityMutation = mutationField((t) => {
       const pastActivityId = pastActivity && pastActivity.mediaId
 
       const id =
-        pastActivityId === null
-          ? await mediaIdLoader.load(anitomyResults.animeTitle)
-          : pastActivityId
+        typeof pastActivityId === 'number'
+          ? pastActivityId
+          : await mediaIdLoader.load(anitomyResults.animeTitle)
 
       const activityAdded = await prisma.activity.create({
         data: {
           ...anitomyResults,
           className: args.className,
           media:
-            id === null || id === undefined
-              ? undefined
-              : {
+            typeof id === 'number'
+              ? {
                   connectOrCreate: { where: { id }, create: { id } },
-                },
+                }
+              : undefined,
         },
       })
 
@@ -116,7 +117,7 @@ const ActivityMutation = mutationField((t) => {
 //   },
 // })
 
-export const AcivityType = objectType({
+export const ActivityType = objectType({
   name: 'Activity',
   definition(t) {
     t.implements('AnitomyResult')
@@ -144,7 +145,7 @@ const ActivityQuery = queryField((t) =>
 )
 
 export const Activity = {
-  AcivityType,
+  ActivityType,
   // ActivityUpdate,
   ActivityQuery,
   ActivitySubscribe,

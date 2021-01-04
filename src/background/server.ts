@@ -20,7 +20,10 @@ export const createServer = async (port: number) => {
 
   const server = new ApolloServer({
     schema,
-    context,
+    context: ({ req }) => ({
+      authorization: req.headers.authorization || null,
+      ...context,
+    }),
   })
 
   promises.writeFile(
