@@ -15,8 +15,11 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       // mainProcessTypeChecking: true,
-      chainWebpackMainProcess: (config) =>
-        config.entry('tracker.worker').add('./src/background/tracker.ts').end(),
+      chainWebpackMainProcess: config =>
+        config
+          .entry('tracker.worker')
+          .add('./src/background/tracker.ts')
+          .end(),
       // nodeIntegration: true,
       experimentalNativeDepCheck: true,
       externals: [
@@ -30,6 +33,9 @@ module.exports = {
         'nexus',
       ],
       mainProcessWatch: ['src/background/**/*'],
+    },
+    autoRouting: {
+      chunkNamePrefix: 'page-',
     },
   },
 }
