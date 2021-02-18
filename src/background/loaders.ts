@@ -6,9 +6,6 @@ import { AnitomyResult } from 'anitomy-js'
 import DataLoader from 'dataloader'
 import { parse } from 'anitomy-js'
 
-
-
-
 const GET_MEDIA_ID = gql`
   query UtilGetMediaId($search: String!) {
     anilistMedia(search: $search, sort: SEARCH_MATCH, type: ANIME) {
@@ -27,15 +24,18 @@ const getMediaId = async (title: string | undefined) => {
     return null
   }
 
-  const { data = null } = await anilistExecutor//<
+  const { data = null } = await anilistExecutor(
+    //<
 
     // UtilGetMediaIdQuery,
     // UtilGetMediaIdQueryVariables
-  //>
-  ({
-    variables: { search: title },
-    document: GET_MEDIA_ID,context:{}
-  })
+    //>
+    {
+      variables: { search: title },
+      document: GET_MEDIA_ID,
+      context: {},
+    },
+  )
 
   return data && data.anilistMedia && data.anilistMedia.id
 }
@@ -55,10 +55,8 @@ const normalizeAnitomyResult = (result: AnitomyResult): AnitomyResultModel =>
     ),
   ) as AnitomyResultModel
 
-
 export type AnitomyResultModel = {
-  [K in keyof AnitomyResult as CamelCase<K>
-  ]: AnitomyResult[K]
+  [K in keyof AnitomyResult as CamelCase<K>]: AnitomyResult[K]
 }
 
 export const anitomyLoader = new DataLoader(

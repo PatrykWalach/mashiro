@@ -1,7 +1,7 @@
 import { FileModel } from './entities/File'
 import Lowdb from 'lowdb'
 import Memory from 'lowdb/adapters/Memory'
-import { PubSub } from 'apollo-server'
+import { PubSub } from 'apollo-server-express'
 import { PrismaClient, PromiseReturnType } from '@prisma/client'
 
 export interface Session {
@@ -15,25 +15,26 @@ enum Events {
 
 import { anitomyLoader, mediaIdLoader } from './loaders'
 
-export const createContext = async () => {
+export const createContext = () => {
+  //async
   return {
     events: Events,
     pubsub: new PubSub(),
     prisma: new PrismaClient(),
     anitomyLoader,
     mediaIdLoader,
-    session: await Lowdb(
-      new Memory<Session>('', {
-        defaultValue: {
-          files: [],
-        },
-      }),
-    ),
+    // session: await Lowdb(
+    //   new Memory<Session>('', {
+    //     defaultValue: {
+    //       files: [],
+    //     },
+    //   }),
+    // ),
   }
 }
 // export interface Context {
 //   prisma: PrismaClient
 // }
-export type Context = PromiseReturnType<typeof createContext> & {
-  authorization: string | null
+export type Context = ReturnType<typeof createContext> & {
+  authorization: string
 }

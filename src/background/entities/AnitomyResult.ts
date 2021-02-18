@@ -7,7 +7,7 @@ export const AnitomyResult = interfaceType({
   definition(t) {
     t.string('animeTitle')
     t.string('episodeNumber')
-    t.string('subgroup')
+    t.string('releaseGroup')
     t.string('videoResolution')
     t.nonNull.string('fileName')
     t.string('fileExtension')

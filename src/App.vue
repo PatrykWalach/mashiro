@@ -1,6 +1,6 @@
 <template>
   <a
-    :href="`https://anilist.co/api/v2/oauth/authorize?client_id=${clientId}&response_type=token`"
+    :href="`https://anilist.co/api/v2/oauth/authorize?client_id=${CLIENT_ID}&response_type=token`"
     >Login with AniList</a
   >
 
@@ -9,11 +9,25 @@
     <router-link to="/about">About</router-link> |
     <router-link to="/activities">Activities</router-link>
   </div>
-  <router-view />
+  <Suspense>
+    <template #fallback>Loading...</template>
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component"></component>
+      </keep-alive>
+    </router-view>
+  </Suspense>
 </template>
 
-<script lang="ts" setup>
-const clientId = process.env.VUE_APP_ANILIST_API_CLIENT_ID
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent(function App() {
+  const CLIENT_ID = process.env.VUE_APP_ANILIST_API_CLIENT_ID
+  return {
+    CLIENT_ID,
+  }
+})
 </script>
 <style lang="scss">
 #app {
@@ -26,14 +40,12 @@ const clientId = process.env.VUE_APP_ANILIST_API_CLIENT_ID
 
 #nav {
   padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+}
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+#nav a.router-link-exact-active {
+  color: #42b983;
 }
 </style>

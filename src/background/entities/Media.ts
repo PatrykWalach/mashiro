@@ -1,13 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaClientOptions } from '@prisma/client/runtime'
 
-const isNumber = (value: unknown): value is number => !Number.isNaN(value)
-
 export const getMediaById = (
   prisma: PrismaClient<PrismaClientOptions, never>,
   id: number | undefined | null,
 ) =>
-  isNumber(id)
+  typeof id === 'number'
     ? prisma.media.findFirst({
         where: { id },
       })

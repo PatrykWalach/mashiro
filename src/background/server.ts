@@ -1,6 +1,6 @@
-import { stitchSchemas } from 'graphql-tools'
+import { stitchSchemas, SubschemaConfig } from 'graphql-tools'
 
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer } from 'apollo-server-express'
 import { electronSubschema } from './schemas/electron'
 import { anilistSubschema as createAnilistSubschema } from './schemas/anilist'
 import { createContext } from './context'
@@ -8,22 +8,32 @@ import { promises } from 'fs'
 import { printSchema } from 'graphql'
 import { join } from 'path'
 
-export const createServer = async (port: number) => {
-  const [anilistSubchema, context] = await Promise.all([
-    createAnilistSubschema(),
-    createContext(),
-  ])
+import express from 'express'
+import { createServer } from 'http'
+
+export const createApolloServer = async (port: number) => {
+  const context = createContext()
+
+  const anilistSubschema = await createAnilistSubschema().catch(() => null)
 
   const schema = stitchSchemas({
-    subschemas: [electronSubschema, anilistSubchema],
+    subschemas: [
+      electronSubschema,
+      anilistSubschema,
+    ].filter((value): value is SubschemaConfig => Boolean(value)),
   })
 
   const server = new ApolloServer({
     schema,
-    context: ({ req }) => ({
-      authorization: req.headers.authorization || null,
-      ...context,
-    }),
+    context: ({ req, connection }) => {
+      if (connection) {
+        return context
+      }
+      return {
+        authorization: req.headers.authorization || null,
+        ...context,
+      }
+    },
   })
 
   promises.writeFile(
@@ -34,10 +44,18 @@ export const createServer = async (port: number) => {
     },
   )
 
-  await server.listen(port, () => {
-    console.log(`Server ready at http://localhost:${port}${server.graphqlPath}`)
+  const app = express()
+  server.applyMiddleware({ app })
+
+  const httpServer = createServer(app)
+  server.installSubscriptionHandlers(httpServer)
+
+  httpServer.listen(port, () => {
     console.log(
-      `Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`,
+      `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`,
+    )
+    console.log(
+      `🚀 Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`,
     )
   })
 
