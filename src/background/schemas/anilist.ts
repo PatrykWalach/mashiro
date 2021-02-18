@@ -1,17 +1,12 @@
 import {
-  AsyncExecutor,
-  ExecutionParams,
   Executor,
-  introspectSchema,
+  loadSchema,
   MergedTypeConfig,
   RenameRootFields,
   SubschemaConfig,
+  UrlLoader,
 } from 'graphql-tools'
-import {
-  valuesFromResults,
-  createMergeResolverWithTransform,
-  createRemoteSchema,
-} from '../util'
+import { valuesFromResults, createMergeResolverWithTransform } from '../util'
 
 import {
   AddFields,
@@ -36,12 +31,14 @@ const merge: Merge = {
     selectionSet: '{ id }',
     fieldName: 'anilistUser',
     args: ({ id }) => ({ id }),
+    canonical: true,
   },
   Media: {
+    canonical: true,
     selectionSet: '{ id }',
     key: ({ id }) => id,
     resolve: createMergeResolverWithTransform({
-      argsFromKeys: (id_in) => ({ id_in }),
+      argsFromKeys: id_in => ({ id_in }),
       valuesFromResults: valuesFromResults('id'),
       fieldName: 'anilistPage',
       transforms: [
@@ -64,38 +61,96 @@ const merge: Merge = {
   },
 }
 
-const executor: AsyncExecutor = async ({ document, variables, context }) =>
-  // : ExecutionParams<any, Context>
-  {
-    const query = print(document)
-    const fetchResult = await fetch('https://graphql.anilist.co', {
+// const executor: AsyncExecutor = async ({ document, variables, context }) =>
+//   // : ExecutionParams<any, Context>
+//   {
+//     const query = print(document)
+//     const fetchResult = await fetch('https://graphql.anilist.co', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         authorization:
+//           (context && ((context as unknown) as Context).authorization) || '',
+//       },
+//       body: JSON.stringify({ query, variables }),
+//     })
+//     return fetchResult.json()
+//   }
+
+// const executorFromLink = linkToExecutor(
+//   new HttpLink({ uri: 'https://graphql.anilist.co', fetch }),
+// )
+
+const isContext = (c: unknown): c is Context =>
+  c instanceof Object &&
+  'authorization' in c &&
+  typeof c['authorization'] === 'string'
+
+// const anilistLink = new HttpLink({
+//   uri: process.env.VUE_APP_ANILIST_API_URL,
+//   fetch,
+// })
+
+// const executor: Executor = ctx => {
+//   const authLink = setContext((_, { headers }) => {
+//     const context = ctx.context
+
+//     if (!isContext(context)) {
+//       return {
+//         headers,
+//       }
+//     }
+
+//     return {
+//       headers: {
+//         ...headers,
+//         authorization: context.authorization,
+//       },
+//     }
+//   })
+
+//   return linkToExecutor(authLink.concat(anilistLink))(ctx)
+// }
+
+export const anilistExecutor: Executor = async ({
+  document,
+  variables,
+  context,
+}) => {
+  const query = print(document)
+  const fetchResult = await fetch(
+    process.env.VUE_APP_ANILIST_API_URL || 'https://graphql.anilist.co',
+    {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        authorization:
-          (((context as unknown) as Context) &&
-            ((context as unknown) as Context).authorization) ||
-          '',
+        authorization: isContext(context)
+          ? `Bearer ${context.authorization}`
+          : ``,
       },
       body: JSON.stringify({ query, variables }),
-    })
-    return fetchResult.json()
-  }
-
-export const anilistSubschema = async () =>
-  // : Promise<
-  //   SubschemaConfig<unknown, unknown, Context>
-  // >
-  ({
-    executor,
-    schema: await introspectSchema(executor),
-    batch: true,
-    batchingOptions: {
-      dataLoaderOptions: { maxBatchSize: 50 },
     },
-    merge,
-    transforms: [new RenameRootFields((operation, name) => `anilist${name}`)],
-  })
+  )
+  return fetchResult.json()
+}
+
+export const anilistSubschema = async (): Promise<SubschemaConfig<
+  unknown,
+  unknown,
+  Context
+>> => ({
+  executor: anilistExecutor,
+  schema: await loadSchema(process.env.VUE_APP_ANILIST_API_URL || '', {
+    loaders: [new UrlLoader()],
+    fetch,
+  }),
+  batch: true,
+  batchingOptions: {
+    dataLoaderOptions: { maxBatchSize: 50 },
+  },
+  merge,
+  transforms: [new RenameRootFields((operation, name) => `anilist${name}`)],
+})
 // createRemoteSchema({
 //   uri: 'https://graphql.anilist.co',
 //   batch: true,

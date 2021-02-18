@@ -1,43 +1,25 @@
 require:
   - ts-node/register
 schema:
-  # - https://graphql.anilist.co
   - schema.graphql
-    # - http://localhost:5000
 hooks:
   afterOneFileWrite:
     - vue-cli-service lint
 config:
-  # noSchemaStitching: false
   namingConvention:
     enumValues: upper-case#upperCase
-    # typeNames: change-case#kebab-case
 generates:
-  # ./src/__generated__/globalTypes.ts:
-  #   plugins:
-  #     - typescript
-  ./src/__generated__/instrospection.ts:
+  ./src/__generated__/introspection.ts:
     plugins:
       - fragment-matcher
-  ./src/__generated__/client.ts:
-    plugins:
-      - typescript-apollo-client-helpers
   ./src/__generated__/globalTypes.ts:
-    schema:
-      - 'directive @connection(key: String, filter: [String!]) on FIELD'
-    # preset: near-operation-file
-    # presetConfig:
-    #   folder: __generated__
-    #   extension: .ts
-    #   baseTypesPath: __generated__/globalTypes.ts
-    # documents: src/**/!(__generated__)/*.ts
     documents: src/**/*.vue
     plugins:
       - typescript
       - typescript-operations
-      - typescript-vue-apollo
+      - typescript-urql
     config:
       immutableTypes: true
       # exportFragmentSpreadSubTypes: true
       documentMode: documentNodeImportFragments
-      vueCompositionApiImportFrom: vue
+      urqlImportFrom: "@urql/vue"

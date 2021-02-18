@@ -48,6 +48,7 @@ module.exports = {
         // 'anitomy-js',
         'nexus-plugin-prisma',
         'nexus',
+        '@urql/vue',
       ],
       mainProcessWatch: ['src/background/**/*'],
     },

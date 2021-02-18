@@ -1,20 +1,9 @@
-// import { print } from 'graphql'
-import fetch from 'cross-fetch'
 import {
-  linkToExecutor,
-  loadSchema,
-  UrlLoader,
-  SubschemaConfig,
   Transform,
   MergedTypeResolverOptions,
   MergedTypeResolver,
   batchDelegateToSchema,
 } from 'graphql-tools'
-
-import {
-  //ApolloLink,
-  HttpLink,
-} from '@apollo/client'
 
 export const diff = <T>(
   prev: T[],
@@ -83,7 +72,7 @@ export const valuesFromResults = <Id extends string | symbol | number>(
   )
   // console.log(media)
   return keys.map(
-    (id) => media[mediaIdToIndex[id]] || null,
+    id => media[mediaIdToIndex[id]] || null,
     //   {
     //   const m = media[mediaIdToIndex[id]]
     //   if (m === null) {
@@ -94,25 +83,25 @@ export const valuesFromResults = <Id extends string | symbol | number>(
   )
 }
 
-export const createRemoteSchema = async ({
-  uri,
-  ...settings
-}: Omit<SubschemaConfig, 'schema' | 'executor'> & { uri: string }) => ({
-  ...settings,
-  executor: linkToExecutor(
-    // ApolloLink.from([
-    //   new ApolloLink((operation, forward) => {
-    //     console.log(print(operation.query))
-    //     console.log(operation.variables)
-    //     return forward(operation)
-    //   }),
-    new HttpLink({ uri, fetch }),
-    // ]),
-  ),
-  schema: await loadSchema(uri, {
-    loaders: [new UrlLoader()],
-  }),
-})
+// export const createRemoteSchema = async ({
+//   uri,
+//   ...settings
+// }: Omit<SubschemaConfig, 'schema' | 'executor'> & { uri: string }) => ({
+//   ...settings,
+//   executor: linkToExecutor(
+//     // ApolloLink.from([
+//     //   new ApolloLink((operation, forward) => {
+//     //     console.log(print(operation.query))
+//     //     console.log(operation.variables)
+//     //     return forward(operation)
+//     //   }),
+//     new HttpLink({ uri, fetch }),
+//     // ]),
+//   ),
+//   schema: await loadSchema(uri, {
+//     loaders: [new UrlLoader()],
+//   }),
+// })
 
 interface MergedTypeResolverWithTransformOptions
   extends MergedTypeResolverOptions {

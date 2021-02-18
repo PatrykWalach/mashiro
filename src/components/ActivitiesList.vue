@@ -1,21 +1,11 @@
-<script lang="ts" setup>
-import { useSuspenseQuery } from '@/background/hooks/useSuspenseQuery'
-import { useActivitiesListQuery } from '@/__generated__/globalTypes'
-import { gql } from '@apollo/client'
+<script lang="ts">
+import { defineComponent } from 'vue'
 
-const ACTIVITIES_LIST_QUERY = gql`
-  query ActivitiesList {
-    activities {
-      id
-    }
-  }
-`
-
-const query = useActivitiesListQuery()
-
-const { result } = await useSuspenseQuery(query)
+export default defineComponent({
+  props: ['activities'],
+})
 </script>
 
 <template>
-  <div>{{ result.activities }}</div>
+  <div>{{ activities }}</div>
 </template>

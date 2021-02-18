@@ -1,29 +1,8 @@
-// import { ApolloClient, InMemoryCache } from '@apollo/client'
-import { ApolloClient, HttpLink, InMemoryCache, split } from '@apollo/client'
-import { WebSocketLink } from '@apollo/client/link/ws'
-import { getMainDefinition, Reference } from '@apollo/client/utilities'
-import { DefaultApolloClient } from '@vue/apollo-composable'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import { setContext } from '@apollo/client/link/context'
 
-import { TypedTypePolicies } from './__generated__/client'
-import instrospection from './__generated__/instrospection'
-
-const typePolicies: TypedTypePolicies = {
-  Query: {
-    fields: {
-      activities: {
-        merge(existing: Reference[] = [], incoming: unknown[]) {
-          return [...existing, ...incoming]
-        },
-      },
-    },
-  },
-}
-
-const authLink = setContext((_, { headers }) => {
+function setAuthorizationHeader(headers: any = {}) {
   const token =
     process.env.VUE_APP_BEARER_TOKEN ?? localStorage.getItem('token')
 
@@ -33,29 +12,40 @@ const authLink = setContext((_, { headers }) => {
       authorization: token ? `Bearer ${token}` : '',
     },
   }
-})
+}
 
-const client = new ApolloClient({
-  link: split(
-    ({ query }) => {
-      const definition = getMainDefinition(query)
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      )
-    },
-    new WebSocketLink({
-      uri: 'ws://127.0.0.1:5000/graphql',
-      options: {
-        reconnect: true,
-      },
+import urql, {
+  createClient,
+  defaultExchanges,
+  subscriptionExchange,
+} from '@urql/vue'
+
+import { SubscriptionClient } from 'subscriptions-transport-ws'
+const subscriptionClient = new SubscriptionClient(
+  `ws://localhost:${process.env.VUE_APP_SERVER_PORT}/graphql`,
+  { reconnect: true },
+)
+
+createApp(App)
+  .use(router)
+  .use(
+    urql,
+    createClient({
+      url: `http://localhost:${process.env.VUE_APP_SERVER_PORT}/graphql`,
+      suspense: true,
+      fetchOptions: setAuthorizationHeader,
+      exchanges: [
+        ...defaultExchanges,
+        // dedupExchange,
+        // cacheExchange,
+        // retryExchange(options),
+        // fetchExchange,
+        subscriptionExchange({
+          forwardSubscription: operation =>
+            subscriptionClient.request(operation),
+        }),
+      ],
     }),
-    authLink.concat(new HttpLink({ uri: 'http://127.0.0.1:5000' })),
-  ),
-  cache: new InMemoryCache({
-    possibleTypes: instrospection.possibleTypes,
-    typePolicies,
-  }),
-})
+  )
 
-createApp(App).use(router).provide(DefaultApolloClient, client).mount('#app')
+  .mount('#app')

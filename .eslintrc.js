@@ -1,8 +1,7 @@
 /*eslint-disable @typescript-eslint/no-var-requires*/
 
 const { readFileSync } = require('fs')
-const schemaString = `directive @connection(key: String, filter: [String!]) on FIELD
-${readFileSync('./schema.graphql', { encoding: 'utf-8' })}`
+const schemaString = readFileSync('./schema.graphql', { encoding: 'utf-8' })
 
 module.exports = {
   root: true,
@@ -23,7 +22,7 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    // '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'graphql/template-strings': [
       'error',
