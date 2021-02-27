@@ -1,7 +1,5 @@
 require:
   - ts-node/register
-schema:
-  - schema.graphql
 hooks:
   afterOneFileWrite:
     - vue-cli-service lint
@@ -9,10 +7,34 @@ config:
   namingConvention:
     enumValues: upper-case#upperCase
 generates:
-  ./src/__generated__/introspection.ts:
+  ./schemas/anilist.graphql:
+    schema:
+      - https://graphql.anilist.co
     plugins:
-      - fragment-matcher
+      - schema-ast
+  ./src/__generated__/introspection.json:
+    schema:
+      - schemas/nexus.graphql
+    plugins:
+      - urql-introspection
+    config:
+      module: commonjs
+  ./src/__generated__/globalAnilistTypes.ts:
+    schema:
+      - https://graphql.anilist.co
+    documents: src/background/**/*.ts
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node
+    config:
+      immutableTypes: true
+      # exportFragmentSpreadSubTypes: true
+      # documentMode: documentNodeImportFragments
+      # urqlImportFrom: "@urql/vue"
   ./src/__generated__/globalTypes.ts:
+    schema:
+      - schemas/nexus.graphql
     documents: src/**/*.vue
     plugins:
       - typescript

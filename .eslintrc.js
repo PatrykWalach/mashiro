@@ -1,7 +1,12 @@
 /*eslint-disable @typescript-eslint/no-var-requires*/
 
 const { readFileSync } = require('fs')
-const schemaString = readFileSync('./schema.graphql', { encoding: 'utf-8' })
+const schemaString = readFileSync('./schemas/nexus.graphql', {
+  encoding: 'utf-8',
+})
+const anilistSchemaString = readFileSync('./schemas/anilist.graphql', {
+  encoding: 'utf-8',
+})
 
 module.exports = {
   root: true,
@@ -27,9 +32,22 @@ module.exports = {
     'graphql/template-strings': [
       'error',
       {
-        env: 'apollo',
+        env: 'literal',
         schemaString,
-        // schemaJson:
+      },
+    ],
+    'graphql/named-operations': [
+      'warn',
+      {
+        schemaString,
+      },
+    ],
+    'graphql/required-fields': [
+      'error',
+      {
+        env: 'literal',
+        schemaString,
+        requiredFields: ['id'],
       },
     ],
     // '@typescript-eslint/no-explicit-any': 'off',
@@ -50,6 +68,32 @@ module.exports = {
       ],
       env: {
         jest: true,
+      },
+    },
+    {
+      files: ['src/background/dataSources/anilistApi.ts'],
+      rules: {
+        'graphql/template-strings': [
+          'error',
+          {
+            env: 'literal',
+            schemaString: anilistSchemaString,
+          },
+        ],
+        'graphql/named-operations': [
+          'warn',
+          {
+            schemaString: anilistSchemaString,
+          },
+        ],
+        'graphql/required-fields': [
+          'error',
+          {
+            env: 'literal',
+            schemaString: anilistSchemaString,
+            requiredFields: ['id'],
+          },
+        ],
       },
     },
   ],
