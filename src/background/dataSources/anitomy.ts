@@ -33,11 +33,11 @@ export class Anitomy extends DataSource<Context> {
     },
   )
 
-  getAnitomyResult(title: string) {
+  getResult(title: string) {
     return this.anitomyLoader.load(title)
   }
 
-  getAnitomyResults(titles: string[]) {
+  getResults(titles: string[]) {
     return this.anitomyLoader.loadMany(titles)
   }
 }
