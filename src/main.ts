@@ -1,15 +1,16 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import '@/assets/main.css'
 
 function setAuthorizationHeader(headers: any = {}) {
   const token =
-    process.env.VUE_APP_BEARER_TOKEN ?? localStorage.getItem('token')
+    process.env.VUE_APP_USER_ID ?? localStorage.getItem('userId') ?? ''
 
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+      authorization: token,
     },
   }
 }
@@ -28,6 +29,7 @@ const subscriptionClient = new SubscriptionClient(
 
 createApp(App)
   .use(router)
+
   .use(
     urql,
     createClient({
@@ -41,7 +43,7 @@ createApp(App)
         // retryExchange(options),
         // fetchExchange,
         subscriptionExchange({
-          forwardSubscription: operation =>
+          forwardSubscription: (operation) =>
             subscriptionClient.request(operation),
         }),
       ],

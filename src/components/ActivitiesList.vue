@@ -7,5 +7,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>{{ activities }}</div>
+  <ul>
+    <li v-for="activity of activities" :key="activity.id">{{ activity }}</li>
+  </ul>
 </template>
