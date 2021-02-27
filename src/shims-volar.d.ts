@@ -5,7 +5,7 @@ import {
   RouteLocationNormalized,
 } from 'vue-router'
 import { UnwrapRef, VNode } from 'vue'
-
+/*eslint-disable @typescript-eslint/class-name-casing*/
 declare global {
   interface __VLS_GlobalComponents {
     RouterLink: typeof RouterLink & {

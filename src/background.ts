@@ -1,10 +1,11 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, shell } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, {
   APOLLO_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer'
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { createApolloServer } from './background/server'
 
 const VUEJS_NEXT_DEVELOPER_TOOLS = {
   electron: process.versions.electron,
@@ -91,8 +92,6 @@ if (isDevelopment) {
     })
   }
 }
-
-import { createApolloServer } from './background/server'
 
 // app.on('before-quit', async () => {
 //   console.log('quit')

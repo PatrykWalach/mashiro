@@ -144,14 +144,14 @@ const ActivityQuery = queryField((t) =>
   }),
 )
 
-export const Activity = {
+export default [
   ActivityType,
   // ActivityUpdate,
   ActivityQuery,
   ActivitySubscribe,
   ActivityMutation,
-  ActivityStatus: enumType({
+  enumType({
     name: 'ActivityStatus',
     members: ActivityStatus,
   }),
-}
+]

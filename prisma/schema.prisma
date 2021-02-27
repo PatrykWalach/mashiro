@@ -7,28 +7,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Activity {
-  className       String   @map("class_name")
-  animeTitle      String?  @map("anime_title")
-  episodeNumber   String?  @map("episode_number")
-  subgroup        String?
-  videoResolution String?  @map("video_resolution")
-  fileName        String   @map("file_name")
-  fileExtension   String?  @map("file_extension")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-  id              Int      @id @default(autoincrement())
-  mediaId         Int?     @map("media_id")
-  status          Int      @default(0)
-  media           Media?   @relation(fields: [mediaId], references: [id])
+model ServiceEnum {
+  id          Int         @id @default(autoincrement())
+  value       String      @unique
+  accounts    Account[]
+  anime       Anime[]
+  listEntries ListEntry[]
 }
 
-model Media {
-  id            Int        @id
-  episodeOffset Int?       @default(0) @map("episode_offset")
-  activities    Activity[]
+model Account {
+  id            Int         @id @default(autoincrement())
+  accountUserId Int
+  token         String
+  service       String
+  userId        Int
+  serviceEnum   ServiceEnum @relation(fields: [service], references: [value])
+  user          User        @relation(fields: [userId], references: [id])
+  listEntries   ListEntry[]
+
+  @@unique([service, userId], name: "accountByServiceAndUserId")
+}
+
+model Anime {
+  id          Int         @id @default(autoincrement())
+  anilistUrl  String?
+  coverImage  String?
+  episodes    Int?
+  serviceId   Int
+  service     String
+  serviceEnum ServiceEnum @relation(fields: [service], references: [value])
+  listEntries ListEntry[]
+
+  @@unique([serviceId, service], name: "animeByService")
+}
+
+model StatusEnum {
+  id          Int         @id @default(autoincrement())
+  value       String      @unique
+  listEntries ListEntry[]
+}
+
+model ListEntry {
+  id          Int         @id @default(autoincrement())
+  score       Float       @default(0)
+  startedAt   DateTime?
+  completedAt DateTime?
+  progress    Int         @default(0)
+  status      String      @default("CURRENT")
+  userId      Int
+  accountId   Int
+  service     String
+  serviceId   Int
+  account     Account     @relation(fields: [accountId], references: [id])
+  serviceEnum ServiceEnum @relation(fields: [service], references: [value])
+  anime       Anime       @relation(fields: [serviceId, service], references: [serviceId, service])
+  statusEnum  StatusEnum  @relation(fields: [status], references: [value])
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@unique([userId, serviceId, accountId, service], name: "userListEntryByAnimeAndService")
 }
 
 model User {
-  id                  Int    @id
-  preferredRssFeedUri String @default("https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0") @map("preferred_rss_feed_uri")
+  name                String      @unique
+  id                  Int         @id @default(autoincrement())
+  preferredRssFeedUri String      @default("https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0")
+  lastLoggedInAt      DateTime    @default(now())
+  avatarUrl           String      @default("https://media.tenor.com/images/6e52b53b32029c6351247976a5d1fa3d/tenor.gif")
+  accounts            Account[]
+  listEntries         ListEntry[]
 }

@@ -112,6 +112,7 @@ export default defineComponent({
     function login(id: number) {
       localStorage.setItem('userId', id.toString())
       //TODO: handle route.query.redirectTo
+      console.warn(route.query.redirectTo)
       router.push('/')
     }
 
@@ -121,6 +122,7 @@ export default defineComponent({
       })
 
       if (!data) {
+        console.warn(error)
         //TODO: handle error
         return
       }

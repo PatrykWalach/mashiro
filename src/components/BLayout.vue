@@ -3,7 +3,7 @@
 </template> -->
 
 <script lang="ts">
-import { computed, defineComponent, h } from 'vue'
+import { defineComponent, h } from 'vue'
 
 export default defineComponent({
   props: ['masonry', 'cols'],

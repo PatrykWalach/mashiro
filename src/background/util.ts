@@ -72,7 +72,7 @@ export const valuesFromResults = <Id extends string | symbol | number>(
   )
   // console.log(media)
   return keys.map(
-    id => media[mediaIdToIndex[id]] || null,
+    (id) => media[mediaIdToIndex[id]] || null,
     //   {
     //   const m = media[mediaIdToIndex[id]]
     //   if (m === null) {

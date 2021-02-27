@@ -13,8 +13,8 @@ export type ItemModel = ItemWithTitle & AnitomyResultModel
 
 import { objectType, stringArg, nonNull, queryField, list } from 'nexus'
 import { join } from 'path'
+import { AnitomyResultModel } from '../dataSources/anitomy'
 import { fetchRssFeed, ItemWithTitle } from '../fetchRssFeed'
-import { AnitomyResultModel } from '../loaders'
 
 const FeedItem = objectType({
   name: 'FeedItem',
@@ -49,7 +49,7 @@ const FeedQuery = queryField('feed', {
     uri: nonNull(stringArg({ description: 'Rss feed url' })),
   },
   type: list(nonNull('FeedItem')),
-  async resolve(_, { uri }, { anitomyLoader }) {
+  async resolve(_, { uri }, { dataSources }) {
     const rss = await fetchRssFeed(uri)
 
     const items = itemToItems(rss.channel.item)
@@ -59,7 +59,9 @@ const FeedQuery = queryField('feed', {
     return Promise.all(
       items.map(
         async (item): Promise<ItemModel> => {
-          const anitomyResult = await anitomyLoader.load(item.title)
+          const anitomyResult = await dataSources.anitomy.getAnitomyResult(
+            item.title,
+          )
           return {
             ...item,
             ...anitomyResult,
@@ -70,7 +72,4 @@ const FeedQuery = queryField('feed', {
   },
 })
 
-export const Feed = {
-  FeedQuery,
-  FeedItem,
-}
+export default [FeedQuery, FeedItem]

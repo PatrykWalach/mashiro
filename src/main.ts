@@ -3,13 +3,12 @@ import App from './App.vue'
 import router from './router'
 import '@/assets/main.css'
 
-function setAuthorizationHeader(headers: any = {}) {
+function setAuthorizationHeader() {
   const token =
     process.env.VUE_APP_USER_ID ?? localStorage.getItem('userId') ?? ''
 
   return {
     headers: {
-      ...headers,
       authorization: token,
     },
   }

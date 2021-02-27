@@ -2,7 +2,7 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin')
 
 module.exports = {
-  configureWebpack: config => {
+  configureWebpack: (config) => {
     config.module.rules.push({
       test: /\.vue$/,
       use: [
@@ -31,24 +31,17 @@ module.exports = {
 
   pluginOptions: {
     electronBuilder: {
-      // mainProcessTypeChecking: true,
-      chainWebpackMainProcess: config =>
-        config
-          .entry('tracker.worker')
-          .add('./src/background/tracker.ts')
-          .end(),
-      // nodeIntegration: true,
       experimentalNativeDepCheck: true,
       externals: [
-        // 'ffi-napi',
         'graphql-tools',
         'graphql',
-        'apollo-server',
+        'apollo-server-express',
         '@prisma/client',
-        // 'anitomy-js',
         'nexus-plugin-prisma',
         'nexus',
+        'express',
         '@urql/vue',
+        '@urql/exchange-retry',
       ],
       mainProcessWatch: ['src/background/**/*'],
     },

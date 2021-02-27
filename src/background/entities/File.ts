@@ -36,7 +36,4 @@ const FileType = objectType({
   },
 })
 
-export const File = {
-  ExtendMedia,
-  FileType,
-}
+export default [ExtendMedia, FileType]

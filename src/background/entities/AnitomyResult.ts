@@ -1,6 +1,6 @@
 import { interfaceType } from 'nexus'
 
-export const AnitomyResult = interfaceType({
+export default interfaceType({
   name: 'AnitomyResult',
   description:
     'mapped AnitomyResult from [anitomy-js](https://github.com/skiptirengu/anitomy-js)',

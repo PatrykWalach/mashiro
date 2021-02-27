@@ -27,3 +27,11 @@ pnpm-debug.log*
 
 #graphql codegen
 __generated__
+
+#yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

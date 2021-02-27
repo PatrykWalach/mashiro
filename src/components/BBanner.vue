@@ -77,7 +77,7 @@
   </Teleport>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref, watch, watchEffect } from 'vue'
+import { defineComponent, ref, watchEffect } from 'vue'
 
 export default defineComponent({
   props: { value: { type: Boolean, default: true } },
