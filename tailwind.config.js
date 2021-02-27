@@ -5,7 +5,7 @@ const typography = require('windicss/plugin/typography')
 
 module.exports = {
   darkMode: 'class',
-  plugins: [typography],
+  plugins: [typography, require('windicss/plugin/forms')],
   theme: {
     extend: {
       colors: {
