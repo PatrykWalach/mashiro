@@ -106,10 +106,16 @@ input AccountWhereUniqueInput {
 }
 
 type Anime {
-  anilistUrl: String
   coverImage: String
   episodes: Int
   id: Int!
+  serviceId: Int!
+  title: String!
+}
+
+input AnimeAnimeByServiceAndTitleCompoundUniqueInput {
+  service: String!
+  title: String!
 }
 
 input AnimeAnimeByServiceCompoundUniqueInput {
@@ -145,6 +151,7 @@ input AnimeCreateWithoutListEntriesInput {
   episodes: Int
   serviceEnum: ServiceEnumCreateNestedOneWithoutAnimeInput!
   serviceId: Int!
+  title: String!
 }
 
 input AnimeCreateWithoutServiceEnumInput {
@@ -153,6 +160,7 @@ input AnimeCreateWithoutServiceEnumInput {
   episodes: Int
   listEntries: ListEntryCreateNestedManyWithoutAnimeInput
   serviceId: Int!
+  title: String!
 }
 
 input AnimeListRelationFilter {
@@ -169,6 +177,7 @@ input AnimeOrderByInput {
   service: SortOrder
   serviceEnum: ServiceEnumOrderByInput
   serviceId: SortOrder
+  title: SortOrder
 }
 
 input AnimeWhereInput {
@@ -183,10 +192,12 @@ input AnimeWhereInput {
   service: StringFilter
   serviceEnum: ServiceEnumWhereInput
   serviceId: IntFilter
+  title: StringFilter
 }
 
 input AnimeWhereUniqueInput {
   animeByService: AnimeAnimeByServiceCompoundUniqueInput
+  animeByServiceAndTitle: AnimeAnimeByServiceAndTitleCompoundUniqueInput
   id: Int
 }
 

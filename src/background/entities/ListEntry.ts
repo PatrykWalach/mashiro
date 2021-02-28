@@ -70,7 +70,7 @@ function createListEntryUpdate(
     progress: anilistAnimeList.progress || undefined,
     score: anilistAnimeList.score || undefined,
     // status: status || 'undefined',
-    detailedStatus: anilistAnimeList.status
+    statusEnum: anilistAnimeList.status
       ? {
           connect: {
             value: anilistAnimeList.status,
@@ -152,7 +152,14 @@ const ListEntryMutation = mutationField((t) => {
           for await (const anilistAnimeList of anilistAPI.fetchUserAnimeList(
             account.accountUserId,
           )) {
-            if (!(anilistAnimeList && anilistAnimeList.media)) {
+            if (
+              !(
+                anilistAnimeList &&
+                anilistAnimeList.media &&
+                anilistAnimeList.media.title &&
+                anilistAnimeList.media.title.userPreferred
+              )
+            ) {
               continue
             }
 
@@ -161,11 +168,17 @@ const ListEntryMutation = mutationField((t) => {
               service: 'ANILIST',
             }
 
-            const animeUpdate = createAnimeUpdate(anilistAnimeList.media)
+            const animeUpdate = {
+              ...createAnimeUpdate(anilistAnimeList.media),
+              title: anilistAnimeList.media.title.userPreferred,
+            }
 
             animeOperations.push(
               prisma.anime.upsert({
-                create: { ...animeByService, ...animeUpdate },
+                create: {
+                  ...animeByService,
+                  ...animeUpdate,
+                },
                 update: animeUpdate,
                 where: {
                   animeByService,

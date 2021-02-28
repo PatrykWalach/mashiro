@@ -18,6 +18,28 @@ async function main() {
       console.log(`${service} exists`)
     }
   }
+  for (const user of [
+    {
+      name: 'Hoodboi',
+      services: {
+        create: {
+          service: 'ANILIST',
+          token: process.env.VUE_APP_BEARER_TOKEN,
+          accountUserId: process.env.VUE_APP_ANILIST_USER_ID,
+        },
+      },
+    },
+  ]) {
+    try {
+      const newUser = await prisma.user.create({
+        data: user,
+      })
+
+      console.log(`new user created`, newUser)
+    } catch {
+      console.log(`${user} exists`)
+    }
+  }
 
   for (const status of [
     'CURRENT',

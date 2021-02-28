@@ -33,12 +33,14 @@ model Anime {
   anilistUrl  String?
   coverImage  String?
   episodes    Int?
+  title       String
   serviceId   Int
   service     String
   serviceEnum ServiceEnum @relation(fields: [service], references: [value])
   listEntries ListEntry[]
 
   @@unique([serviceId, service], name: "animeByService")
+  @@unique([title, service], name: "animeByServiceAndTitle")
 }
 
 model StatusEnum {
