@@ -57,18 +57,6 @@ import { gql } from '@urql/vue'
 import { defineComponent, reactive, ref, toRefs } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-//  accounts: {
-//     create: {
-//       service: {
-//         connectOrCreate: {
-//           create: { name: "ANILIST" }
-//           where: { name: "ANILIST" }
-//         }
-//       }
-//       token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6Ijc5ZGZhMzkxODAwNjkzOTNkMTkyZjVhZjg3MDRmMmI2YTg3NGYzZDViYmI3ZGM5ZDBmZjA2ZDU2OTc4MDRjNWE4MGNjNWUwOTVjYjllYWQxIn0.eyJhdWQiOiIzNDU1IiwianRpIjoiNzlkZmEzOTE4MDA2OTM5M2QxOTJmNWFmODcwNGYyYjZhODc0ZjNkNWJiYjdkYzlkMGZmMDZkNTY5NzgwNGM1YTgwY2M1ZTA5NWNiOWVhZDEiLCJpYXQiOjE2MTM4MjU5NjAsIm5iZiI6MTYxMzgyNTk2MCwiZXhwIjoxNjQ1MzYxOTYwLCJzdWIiOiIyMjA4MzIiLCJzY29wZXMiOltdfQ.AXYbgyIRbXsOkTnFixBGKB91E86UnE-mFi_6UUTl8JRQRtJzbzP3rpKLSvyyIwycxdG7CemrOE3x6fvhmIcvxg-AgBlXJLhgPCNq9Pcs0dROulNLEQSpiPlHn1V-fcGUWYSI-E4dyVBVPX9IFzYt9mB5wx8PS4iJA_Sk7VC-6rrxwKKKMRXS3zSdej0FJiPZrvLOJIS3FarN8i9eoziB3FJoaAOi8CReXFHkmFAawE4tweM7H8xC2ksAFV8fiIujiu0RPNFLA04flONvnutVhQGKICFUgKMf7rgsw3tF-mwkurRnyaUZp-LAuBll4ZXPebV4Lw0EkAW_csO3gm-_JWekI6QmA3wKPre_N2TcA9ssDJSJa0_QkxI_tlkx3fsSpURoxnycTobfN45CsSkV2bdDw7xVRBRrPJ4syh7PDIHheMrtr5N3dwbE8vBRxW73D7rjsCHEvHUL12UnkvXCEoEh1lKMYB4I3z7q0IeLqpWn4yYZvbmP1WNHpJWO46nU7DJ5x4ImOwvzM0GaM-4gthhvP1Yhbf5EgpGPWekenz2QQYV8GvCO-cf2oH4w-011YNvuhbhAjPrSUbET7-aMzeJHHgUll0UUrig0NNXFBI88FHbzIE5eBve7B_2BdmynrEeCf5EXY562r0B4yF24LACnEf1DDB33NjPgG5asirg"
-//     }
-//   }
-
 export const CREATE_USER = gql`
   mutation loginCreateUser($name: String!) {
     createOneUser(data: { name: $name }) {
