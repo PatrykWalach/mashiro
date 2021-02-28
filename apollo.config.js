@@ -1,6 +1,6 @@
 module.exports = {
   client: {
-    service: { localSchemaFile: './schema.graphql' },
+    service: { localSchemaFile: 'schemas/nexus.graphql' },
     includes: ['src/**/*.vue'],
   },
 }
