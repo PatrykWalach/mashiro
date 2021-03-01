@@ -19,7 +19,7 @@ import { fetchRssFeed, ItemWithTitle } from '../fetchRssFeed'
 const FeedItem = objectType({
   name: 'FeedItem',
   sourceType: {
-    module: join(__dirname, '../src/background/entities/Feed.ts'),
+    module: join(__dirname, '../background/entities/Feed.ts'),
     export: 'ItemModel',
   },
   definition(t) {

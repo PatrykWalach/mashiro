@@ -19,10 +19,10 @@ generates:
       - urql-introspection
     config:
       module: commonjs
-  ./src/__generated__/globalAnilistTypes.ts:
+  ./background/__generated__/globalAnilistTypes.ts:
     schema:
       - https://graphql.anilist.co
-    documents: src/background/**/*.ts
+    documents: background/**/*.ts
     plugins:
       - typescript
       - typescript-operations

@@ -15,6 +15,7 @@ enum Events {
 }
 
 export const prisma = new PrismaClient()
+export const anitomy = new Anitomy()
 
 export const createContext = () => {
   //async

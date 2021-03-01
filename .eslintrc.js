@@ -71,7 +71,7 @@ module.exports = {
       },
     },
     {
-      files: ['src/background/dataSources/anilistApi.ts'],
+      files: ['background/dataSources/anilistApi.ts'],
       rules: {
         'graphql/template-strings': [
           'error',

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires*/
 const CircularDependencyPlugin = require('circular-dependency-plugin')
+const ExpressAutoPathsPlugin = require('./ExpressAutoPathsPlugin')
 
 module.exports = {
   configureWebpack: (config) => {
@@ -26,6 +27,12 @@ module.exports = {
         allowAsyncCycles: false,
         cwd: process.cwd(),
       }),
+      new ExpressAutoPathsPlugin({
+        paths: 'background/paths',
+        importPrefix: './paths/',
+        output: 'background/paths.ts',
+        types: 'background/__generated__/paths.ts',
+      }),
     )
   },
 
@@ -43,7 +50,7 @@ module.exports = {
         '@urql/vue',
         '@urql/exchange-retry',
       ],
-      mainProcessWatch: ['src/background/**/*'],
+      mainProcessWatch: ['background/**/*'],
     },
     autoRouting: {
       chunkNamePrefix: 'page-',

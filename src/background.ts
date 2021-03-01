@@ -5,7 +5,7 @@ import installExtension, {
   APOLLO_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { createApolloServer } from './background/server'
+import { createApolloServer } from '../background/server'
 
 const VUEJS_NEXT_DEVELOPER_TOOLS = {
   electron: process.versions.electron,

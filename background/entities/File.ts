@@ -31,7 +31,7 @@ const FileType = objectType({
     t.implements('AnitomyResult')
   },
   sourceType: {
-    module: join(__dirname, '../src/background/entities/File.ts'),
+    module: join(__dirname, '../background/entities/File.ts'),
     export: 'FileModel',
   },
 })
